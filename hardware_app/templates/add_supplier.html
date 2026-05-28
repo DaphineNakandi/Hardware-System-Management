@@ -1,0 +1,218 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    
+    <!-- PAGE HEADER -->
+    
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+
+            <h2 class="fw-bold text-light">
+                Add Supplier
+            </h2>
+
+            <p class="text-muted mb-0">
+                Register a new supplier into the system
+            </p>
+
+        </div>
+
+        <a
+            href="{% url 'supplier_list' %}"
+            class="back-btn"
+        >
+
+            <i class="bi bi-arrow-left"></i>
+
+            Back
+
+        </a>
+
+    </div>
+
+
+
+    <!-- FORM CARD -->
+
+
+    <div class="custom-card">
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            <div class="row g-4">
+
+
+                <!-- SUPPLIER NAME -->
+
+                <div class="col-md-6">
+
+                    <label class="custom-label">
+                        Supplier Name
+                    </label>
+
+                    {{ form.name }}
+
+                    {% if form.name.errors %}
+                        <div class="error-message">
+                            {{ form.name.errors }}
+                        </div>
+                    {% endif %}
+
+                </div>
+
+
+                <!-- CONTACT PERSON -->
+
+                <div class="col-md-6">
+
+                    <label class="custom-label">
+                        Contact Person
+                    </label>
+
+                    {{ form.contact_person }}
+
+                    {% if form.contact_person.errors %}
+                        <div class="error-message">
+                            {{ form.contact_person.errors }}
+                        </div>
+                    {% endif %}
+
+                </div>
+
+
+                <!-- PHONE -->
+
+                <div class="col-md-6">
+
+                    <label class="custom-label">
+                        Phone
+                    </label>
+
+                    {{ form.phone }}
+
+                    {% if form.phone.errors %}
+                        <div class="error-message">
+                            {{ form.phone.errors }}
+                        </div>
+                    {% endif %}
+
+                </div>
+
+
+                <!-- EMAIL -->
+
+                <div class="col-md-6">
+
+                    <label class="custom-label">
+                        Email
+                    </label>
+
+                    {{ form.email }}
+
+                    {% if form.email.errors %}
+                        <div class="error-message">
+                            {{ form.email.errors }}
+                        </div>
+                    {% endif %}
+
+                </div>
+
+
+                <!-- ADDRESS -->
+
+                <div class="col-12">
+
+                    <label class="custom-label">
+                        Address
+                    </label>
+
+                    {{ form.address }}
+
+                    {% if form.address.errors %}
+                        <div class="error-message">
+                            {{ form.address.errors }}
+                        </div>
+                    {% endif %}
+
+                </div>
+
+
+                <!-- CREDIT BALANCE -->
+
+                <div class="col-md-6">
+
+                    <label class="custom-label">
+                        Credit Balance (UGX)
+                    </label>
+
+                    {{ form.credit_balance }}
+
+                    {% if form.credit_balance.errors %}
+                        <div class="error-message">
+                            {{ form.credit_balance.errors }}
+                        </div>
+                    {% endif %}
+
+                </div>
+
+
+                <!-- NOTES -->
+
+                <div class="col-12">
+
+                    <label class="custom-label">
+                        Notes
+                    </label>
+
+                    {{ form.notes }}
+
+                    {% if form.notes.errors %}
+                        <div class="error-message">
+                            {{ form.notes.errors }}
+                        </div>
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            
+            <!-- BUTTONS -->
+
+            <div class="d-flex justify-content-end gap-3 mt-4">
+
+                <a
+                    href="{% url 'supplier_list' %}"
+                    class="btn btn-secondary"
+                >
+                    Cancel
+                </a>
+
+                <button
+                    type="submit"
+                    class="save-btn"
+                >
+
+                    <i class="bi bi-check-circle me-2"></i>
+
+                    Save Supplier
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

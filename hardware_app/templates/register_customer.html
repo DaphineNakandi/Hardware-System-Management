@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h2 class="fw-bold text-light mb-1">
+                Register Customer
+            </h2>
+
+            <p class="text-secondary mb-0">
+                Add a new deposit scheme customer
+            </p>
+        </div>
+
+        <a href="{% url 'customer_list' %}" class="back-btn">
+            <i class="bi bi-arrow-left"></i>
+            Customers
+        </a>
+
+    </div>
+
+    <!-- FORM CARD -->
+    <div class="custom-card">
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            <div class="row">
+
+                <!-- FULL NAME -->
+                <div class="col-md-6 mb-4">
+                    <label class="custom-label">
+                        Full Name (as on ID)
+                    </label>
+
+                    <input
+                        type="text"
+                        name="full_name"
+                        class="custom-input"
+                        placeholder="John Doe"
+                        required
+                    >
+                </div>
+
+                <!-- NIN -->
+                <div class="col-md-6 mb-4">
+                    <label class="custom-label">
+                        National ID Number (NIN)
+                    </label>
+
+                    <input
+                        type="text"
+                        name="nin"
+                        class="custom-input"
+                        placeholder="CM1234567890AB"
+                        pattern="[A-Z0-9]{10,20}"
+                        title="NIN must be 10-20 letters and numbers only"
+                        required
+                    >
+
+                    <small class="form-text">
+                        Example: CM1234567890AB
+                    </small>
+                </div>
+
+                <!-- PHONE -->
+                <div class="col-md-6 mb-4">
+                    <label class="custom-label">
+                        Phone Number
+                    </label>
+
+                    <input
+                        type="tel"
+                        name="phone"
+                        class="custom-input"
+                        placeholder="0772123456"
+                        pattern="[0-9]{10,12}"
+                        title="Phone must be 10-12 digits"
+                        required
+                    >
+
+                    <small class="form-text">
+                        Example: 0772123456
+                    </small>
+                </div>
+
+                <!-- EMPLOYER -->
+                <div class="col-md-6 mb-4">
+                    <label class="custom-label">
+                        Employer (Optional)
+                    </label>
+
+                    <input
+                        type="text"
+                        name="employer"
+                        class="custom-input"
+                        placeholder="Company Name"
+                    >
+                </div>
+
+                <!-- SALARY -->
+                <div class="col-md-6 mb-2">
+                    <label class="custom-label">
+                        Monthly Salary (UGX)
+                    </label>
+
+                    <input
+                        type="number"
+                        name="monthly_salary"
+                        class="custom-input"
+                        value="0"
+                        step="1000"
+                    >
+                </div>
+
+            </div>
+
+            <!-- BUTTONS -->
+            <div class="d-flex justify-content-end gap-3 mt-4">
+
+                <a href="{% url 'customer_list' %}" class="cancel-btn">
+                    Cancel
+                </a>
+
+                <button type="submit" class="save-btn">
+
+                    <i class="bi bi-person-plus me-2"></i>
+
+                    Register Customer
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

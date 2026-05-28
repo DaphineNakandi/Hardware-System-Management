@@ -1,0 +1,218 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    
+    <!-- PAGE HEADER -->
+
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+
+        <div>
+
+            <h2 class="fw-bold text-light mb-1">
+
+                Edit Customer
+
+            </h2>
+
+            <p class="text-muted mb-0">
+
+                {{ customer.full_name }}
+                (NIN: {{ customer.nin }})
+
+            </p>
+
+        </div>
+
+
+        <!-- BACK BUTTON -->
+
+        <a
+            href="{% url 'customer_detail' customer.id %}"
+            class="back-btn"
+        >
+
+            <i class="bi bi-arrow-left"></i>
+
+            Back
+
+        </a>
+
+    </div>
+
+
+    <!-- FORM CARD -->
+
+    <div class="custom-card">
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            <div class="row">
+
+                <!-- FULL NAME -->
+
+                <div class="col-md-6 mb-4">
+
+                    <label class="custom-label">
+
+                        Full Name
+
+                    </label>
+
+                    <input
+                        type="text"
+                        name="full_name"
+                        class="custom-input"
+                        value="{{ customer.full_name }}"
+                    >
+
+                </div>
+
+
+                <!-- PHONE -->
+
+                <div class="col-md-6 mb-4">
+
+                    <label class="custom-label">
+
+                        Phone Number
+
+                    </label>
+
+                    <input
+                        type="text"
+                        name="phone"
+                        class="custom-input"
+                        value="{{ customer.phone }}"
+                    >
+
+                </div>
+
+
+                <!-- EMPLOYER -->
+
+                <div class="col-md-6 mb-4">
+
+                    <label class="custom-label">
+
+                        Employer
+
+                    </label>
+
+                    <input
+                        type="text"
+                        name="employer"
+                        class="custom-input"
+                        value="{{ customer.employer }}"
+                    >
+
+                </div>
+
+
+                <!-- SALARY -->
+
+                <div class="col-md-6 mb-4">
+
+                    <label class="custom-label">
+
+                        Monthly Salary (UGX)
+
+                    </label>
+
+                    <input
+                        type="number"
+                        name="monthly_salary"
+                        class="custom-input"
+                        value="{{ customer.monthly_salary }}"
+                    >
+
+                </div>
+
+
+                <!-- NOTES -->
+
+                <div class="col-12 mb-4">
+
+                    <label class="custom-label">
+
+                        Notes
+
+                    </label>
+
+                    <textarea
+                        name="notes"
+                        rows="4"
+                        class="custom-input"
+                    >{{ customer.notes }}</textarea>
+
+                </div>
+
+
+                <!-- ACTIVE STATUS -->
+
+                <div class="col-12 mb-4">
+
+                    <div class="custom-checkbox-wrapper">
+
+                        <input
+                            type="checkbox"
+                            name="is_active"
+                            id="is_active"
+                            class="custom-checkbox"
+
+                            {% if customer.is_active %}
+                                checked
+                            {% endif %}
+                        >
+
+                        <label for="is_active" class="checkbox-label">
+
+                            Customer is active and can withdraw goods
+
+                        </label>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- BUTTONS -->
+
+            <div class="d-flex justify-content-end gap-3 flex-wrap mt-4">
+
+                <a
+                    href="{% url 'customer_detail' customer.id %}"
+                    class="back-btn"
+                >
+
+                    Cancel
+
+                </a>
+
+
+                <button
+                    type="submit"
+                    class="save-btn"
+                >
+
+                    <i class="bi bi-check-circle me-2"></i>
+
+                    Save Changes
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

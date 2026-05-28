@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container mt-4">
+
+  <!-- HEADER -->
+  <div class="d-flex justify-content-between align-items-start mb-4">
+    <div>
+      <h3 class="fw-bold mb-1">Stock & Sales History</h3>
+      <p class="text-muted mb-0">Product: {{ product.name }}</p>
+    </div>
+
+    <div class="d-flex gap-2">
+      <a href="{% url 'add_stock' product.id %}" class="btn btn-success">
+        + Add Stock
+      </a>
+      <a href="{% url 'make_sale' %}" class="btn btn-primary">
+        + Record Sale
+      </a>
+    </div>
+  </div>
+
+  <!-- STOCK SECTION -->
+  <div class="card shadow-sm border-0 rounded-4 mb-4">
+    <div class="card-body">
+      <h5 class="fw-bold mb-3">Stock Entries</h5>
+
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>Qty</th>
+              <th>Cost Price</th>
+              <th>Selling Price</th>
+              <th>Supplier</th>
+              <th>Payment</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {% for entry in stock_entries %}
+            <tr>
+              <td class="fw-semibold">{{ entry.quantity }}</td>
+              <td>UGX {{ entry.cost_price|floatformat:0 }}</td>
+              <td>UGX {{ entry.selling_price|floatformat:0 }}</td>
+              <td>{{ entry.supplier|default:"-" }}</td>
+              <td>
+                <span class="badge bg-secondary">
+                  {{ entry.payment|default:"-" }}
+                </span>
+              </td>
+              <td class="text-muted">
+                {{ entry.date_received|date:"Y-m-d" }}
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="6" class="text-center text-muted py-4">
+                No stock entries yet
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SALES SECTION -->
+  <div class="card shadow-sm border-0 rounded-4">
+    <div class="card-body">
+      <h5 class="fw-bold mb-3">Sales</h5>
+
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>Qty Sold</th>
+              <th>Selling Price</th>
+              <th>Transport</th>
+              <th>Payment</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {% for sale in sales %}
+            <tr>
+              <td class="fw-semibold">{{ sale.quantity_sold }}</td>
+              <td>UGX {{ sale.selling_price|floatformat:0 }}</td>
+              <td>UGX {{ sale.transport|default:"0"|floatformat:0 }}</td>
+              <td>
+                <span class="badge bg-info text-dark">
+                  {{ sale.paymentmethod }}
+                </span>
+              </td>
+              <td class="text-muted">
+                {{ sale.date_sold|date:"Y-m-d" }}
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="5" class="text-center text-muted py-4">
+                No sales recorded yet
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}

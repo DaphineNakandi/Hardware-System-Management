@@ -1,0 +1,250 @@
+{% extends 'base.html' %}
+
+{% load static %}
+{% load humanize %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+
+    <!-- PAGE HEADER -->
+
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+
+        <div>
+
+            <h2 class="fw-bold text-light mb-1">
+                Dashboard
+            </h2>
+
+            <p class="text-muted mb-0">
+                Overview of inventory, sales and deposit activities
+            </p>
+
+        </div>
+
+        <a href="{% url 'reports' %}" class="save-btn">
+
+            <i class="bi bi-bar-chart-line me-2"></i>
+
+            View Reports
+
+        </a>
+
+    </div>
+
+
+
+    <!-- STAT CARDS -->
+
+    <div class="row mb-4">
+
+        <!-- PRODUCTS -->
+
+        <div class="col-md-3 mb-3">
+
+            <div class="card stat-card h-100">
+
+                <div class="card-body text-center">
+
+                    <div class="stat-icon mb-3">
+                        <i class="bi bi-box-seam"></i>
+                    </div>
+
+                    <h2 class="fw-bold">
+                        {{ total_products }}
+                    </h2>
+
+                    <p class="mb-0 text-muted">
+                        Total Products
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- SALES -->
+
+        <div class="col-md-3 mb-3">
+
+            <div class="card stat-card h-100">
+
+                <div class="card-body text-center">
+
+                    <div class="stat-icon mb-3">
+                        <i class="bi bi-cash-stack"></i>
+                    </div>
+
+                    <h4 class="fw-bold">
+
+                        UGX {{ today_sales|intcomma }}
+
+                    </h4>
+
+                    <p class="mb-0 text-muted">
+                        Today's Sales
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- LOW STOCK -->
+
+        <div class="col-md-3 mb-3">
+
+            <div class="card stat-card h-100">
+
+                <div class="card-body text-center">
+
+                    <div class="stat-icon mb-3">
+                        <i class="bi bi-exclamation-triangle"></i>
+                    </div>
+
+                    <h2 class="fw-bold">
+                        {{ low_stock_count }}
+                    </h2>
+
+                    <p class="mb-0 text-muted">
+                        Low Stock Items
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- CUSTOMERS -->
+
+        <div class="col-md-3 mb-3">
+
+            <div class="card stat-card h-100">
+
+                <div class="card-body text-center">
+
+                    <div class="stat-icon mb-3">
+                        <i class="bi bi-people"></i>
+                    </div>
+
+                    <h2 class="fw-bold">
+                        {{ active_customers }}
+                    </h2>
+
+                    <p class="mb-0 text-muted">
+                        Active Customers
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- LOW STOCK TABLE -->
+
+    <div class="custom-card">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+
+            <div>
+
+                <h4 class="fw-bold mb-1">
+                    Low Stock Alerts
+                </h4>
+
+                <p class="text-muted mb-0">
+                    Products that need restocking soon
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="table-responsive">
+
+            <table class="table align-middle">
+
+                <thead>
+
+                    <tr>
+                        <th>Product</th>
+                        <th>Current Stock</th>
+                        <th>Reorder Level</th>
+                        <th>Status</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for product in low_stock_products %}
+
+                        <tr>
+
+                            <td class="fw-semibold">
+
+                                {{ product.name }}
+
+                                {% if product.specification %}
+                                    <small class="text-muted d-block">
+                                        {{ product.specification }}
+                                    </small>
+                                {% endif %}
+
+                            </td>
+
+                            <td>
+                                {{ product.current_quantity|intcomma }}
+                            </td>
+
+                            <td>
+                                {{ product.reorder_level|intcomma }}
+                            </td>
+
+                            <td>
+
+                                <span class="low-stock-badge">
+                                    LOW STOCK
+                                </span>
+
+                            </td>
+
+                        </tr>
+
+                    {% empty %}
+
+                        <tr>
+
+                            <td colspan="4" class="text-center py-5 text-muted">
+                                No low stock items found
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
