@@ -34,7 +34,7 @@
     <div class="card shadow-sm border-0 rounded-4">
         <div class="card-body p-4">
 
-            <form method="POST">
+            <form method="POST" novalidate>
                 {% csrf_token %}
 
                 <div class="row g-3">
@@ -42,20 +42,15 @@
                     <!-- PRODUCT -->
                     <div class="col-12">
                         <label class="form-label">Product</label>
-                        <select name="product" class="form-select form-select-lg" required>
-                            <option value="">Select Product</option>
-                            {% for p in products %}
-                                <option value="{{ p.id }}">
-                                    {{ p.name }} {{ p.specification }}
-                                </option>
-                            {% endfor %}
-                        </select>
+                        {{ form.product }}
+                        {{ form.product.errors }}
                     </div>
 
                     <!-- QUANTITY -->
                     <div class="col-md-6">
                         <label class="form-label">Quantity</label>
-                        <input type="number" name="quantity" min="1" class="form-control form-control-lg" required>
+                        {{ form.quantity }}
+                        {{ form.quantity.errors }}
                     </div>
 
                 </div>

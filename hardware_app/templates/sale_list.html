@@ -181,7 +181,7 @@
                         <td>
 
                             <span class="payment-badge">
-                                {{ sale.paymentmethod }}
+                                {{ sale.payment_method }}
                             </span>
 
                         </td>
@@ -202,9 +202,6 @@
                                     <i class="bi bi-pencil"></i>
 
                                 </a>
-
-                                <a href="{% url 'delete_sale' sale.id %}"
-                                   class="action-btn delete-btn">
 
                                     <i class="bi bi-trash"></i>
 

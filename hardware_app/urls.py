@@ -21,11 +21,11 @@ urlpatterns = [
         name='edit_product'
     ),
 
-    path(
-        'products/<int:product_id>/delete/',
-        views.delete_product,
-        name='delete_product'
-    ),
+    # path(
+    #     'products/<int:product_id>/delete/',
+    #     views.delete_product,
+    #     name='delete_product'
+    # ),
 
     # STOCK
     path(
@@ -52,11 +52,11 @@ urlpatterns = [
         name='edit_stock_entry'
     ),
 
-    path(
-        'stock/<int:entry_id>/delete/',
-        views.delete_stock_entry,
-        name='delete_stock_entry'
-    ),
+    # path(
+    #     'stock/<int:entry_id>/delete/',
+    #     views.delete_stock_entry,
+    #     name='delete_stock_entry'
+    # ),
 
     # CUSTOMERS
     path(
@@ -83,11 +83,11 @@ urlpatterns = [
         name='edit_customer'
     ),
 
-    path(
-        'customers/<int:customer_id>/delete/',
-        views.delete_customer,
-        name='delete_customer'
-    ),
+    # path(
+    #     'customers/<int:customer_id>/delete/',
+    #     views.delete_customer,
+    #     name='delete_customer'
+    # ),
 
     path(
         'customers/<int:customer_id>/deposit/',
@@ -132,11 +132,11 @@ urlpatterns = [
         name='edit_supplier'
     ),
 
-    path(
-        'suppliers/<int:supplier_id>/delete/',
-        views.delete_supplier,
-        name='delete_supplier'
-    ),
+    # path(
+    #     'suppliers/<int:supplier_id>/delete/',
+    #     views.delete_supplier,
+    #     name='delete_supplier'
+    # ),
 
     # SALES
     path(
@@ -157,11 +157,11 @@ urlpatterns = [
         name='edit_sale'
     ),
 
-    path(
-        'sales/<int:sale_id>/delete/',
-        views.delete_sale,
-        name='delete_sale'
-    ),
+    # path(
+    #     'sales/<int:sale_id>/delete/',
+    #     views.delete_sale,
+    #     name='delete_sale'
+    # ),
 
     # REPORTS
     path(
@@ -169,5 +169,8 @@ urlpatterns = [
         views.reports,
         name='reports'
     ),
+
+
+    
 ]
 

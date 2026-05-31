@@ -32,7 +32,14 @@
     <!-- FORM CARD -->
     <div class="custom-card">
 
-        <form method="POST">
+        {% if from.non_field_errors %}
+        <di class="alert alert-danger">
+            {% for error in form.non_field_errors %}
+            <p>{{ error }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+        <form method="POST" novalidate>
 
             {% csrf_token %}
 

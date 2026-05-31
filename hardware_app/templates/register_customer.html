@@ -27,9 +27,19 @@
     <!-- FORM CARD -->
     <div class="custom-card">
 
-        <form method="POST">
+        <form method="POST" novalidate>
 
             {% csrf_token %}
+
+            {% if form.errors %}
+                <div class="alert alert-danger">
+                    {% for field, errors in form.errors.items %}
+                        {% for error in errors %}
+                        <p><strong>{{ field|title }}:</strong> {{ error }}</p>
+                    {% endfor %}
+                    {% endfor %}
+                </div>
+            {% endif %}
 
             <div class="row">
 
@@ -43,9 +53,19 @@
                         type="text"
                         name="full_name"
                         class="custom-input"
-                        placeholder="John Doe"
-                        required
+                        placeholder="Candy Toblerone Murunji"
+                        value="{{ form.full_name.value|default:'' }}"
+                       
                     >
+
+                    <!-- show errors -->
+                     {% if form.full_name.errors %}
+                        <div class="alert alert-danger mt-2">
+                            {% for error in form.full_name.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                     {% endif %}
                 </div>
 
                 <!-- NIN -->
@@ -59,14 +79,19 @@
                         name="nin"
                         class="custom-input"
                         placeholder="CM1234567890AB"
-                        pattern="[A-Z0-9]{10,20}"
-                        title="NIN must be 10-20 letters and numbers only"
-                        required
+                        value="{{ form.nin.value|default:'' }}"
                     >
 
                     <small class="form-text">
                         Example: CM1234567890AB
                     </small>
+                    {% if form.nin.errors %}
+                        <div class="alert alert-danger mt-2">
+                            {% for error in form.nin.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                     {% endif %}
                 </div>
 
                 <!-- PHONE -->
@@ -80,14 +105,19 @@
                         name="phone"
                         class="custom-input"
                         placeholder="0772123456"
-                        pattern="[0-9]{10,12}"
-                        title="Phone must be 10-12 digits"
-                        required
+                        
                     >
 
                     <small class="form-text">
                         Example: 0772123456
                     </small>
+                    {% if form.phone.errors %}
+                        <div class="alert alert-danger mt-2">
+                            {% for error in form.phone.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                     {% endif %}
                 </div>
 
                 <!-- EMPLOYER -->
@@ -101,7 +131,15 @@
                         name="employer"
                         class="custom-input"
                         placeholder="Company Name"
+                        value="{{ form.employer.value|default:'' }}"
                     >
+                    {% if form.employer.errors %}
+                        <div class="alert alert-danger mt-2">
+                            {% for error in form.employer.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                     {% endif %}
                 </div>
 
                 <!-- SALARY -->
@@ -117,6 +155,13 @@
                         value="0"
                         step="1000"
                     >
+                    {% if form.monthly_salary.errors %}
+                        <div class="alert alert-danger mt-2">
+                            {% for error in form.monthly_salary.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                     {% endif %}
                 </div>
 
             </div>
