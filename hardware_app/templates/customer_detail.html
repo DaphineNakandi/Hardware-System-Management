@@ -1,295 +1,181 @@
-{% extends 'base.html' %}
-
-{% block content %}
+{% extends 'base.html' %} {% block content %}
 
 <div class="container mt-4">
+  <!-- CUSTOMER HEADER -->
 
-    
-    <!-- CUSTOMER HEADER -->
+  <div class="custom-card mb-4">
+    <div
+      class="d-flex justify-content-between align-items-start flex-wrap gap-3"
+    >
+      <div>
+        <h2 class="fw-bold text-light mb-2">{{ customer.full_name }}</h2>
 
-    <div class="custom-card mb-4">
+        <p class="text-muted mb-1">
+          <strong>NIN:</strong>
+          {{ customer.nin }}
+        </p>
 
-        <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+        <p class="text-muted mb-1">
+          <strong>Phone:</strong>
+          {{ customer.phone }}
+        </p>
 
-            <div>
+        {% if customer.employer %}
 
-                <h2 class="fw-bold text-light mb-2">
+        <p class="text-muted mb-1">
+          <strong>Employer:</strong>
+          {{ customer.employer }}
+        </p>
 
-                    {{ customer.full_name }}
+        {% endif %}
+      </div>
 
-                </h2>
+      <!-- BALANCE CARD -->
 
-                <p class="text-muted mb-1">
+      <div class="balance-card">
+        <small class="text-white fw-semibold"> Current Balance </small>
 
-                    <strong>NIN:</strong>
-                    {{ customer.nin }}
-
-                </p>
-
-                <p class="text-muted mb-1">
-
-                    <strong>Phone:</strong>
-                    {{ customer.phone }}
-
-                </p>
-
-                {% if customer.employer %}
-
-                    <p class="text-muted mb-1">
-
-                        <strong>Employer:</strong>
-                        {{ customer.employer }}
-
-                    </p>
-
-                {% endif %}
-
-            </div>
-
-
-            <!-- BALANCE CARD -->
-
-            <div class="balance-card">
-
-                <small class="text-white fw-semibold">
-                    Current Balance
-                </small>
-
-                <h3 class="fw-bold mb-0">
-                    UGX {{ customer.current_balance|floatformat:0 }}
-                </h3>
-
-            </div>
-
-        </div>
-
-
-        <!-- ACTION BUTTONS -->
-
-        <div class="d-flex flex-wrap gap-3 mt-4">
-
-            <a
-                href="{% url 'record_deposit' customer.id %}"
-                class="save-btn"
-            >
-
-                <i class="bi bi-plus-circle me-2"></i>
-
-                Add Deposit
-
-            </a>
-
-
-            <a
-                href="{% url 'withdraw_goods' customer.id %}"
-                class="btn btn-warning"
-            >
-
-                <i class="bi bi-box-arrow-up-right me-2"></i>
-
-                Withdraw Goods
-
-            </a>
-
-
-            <a
-                href="{% url 'edit_customer' customer.id %}"
-                class="btn btn-outline-light"
-            >
-
-                <i class="bi bi-pencil me-2"></i>
-
-                Edit Customer
-
-            </a>
-
-
-            <a
-                href="{% url 'customer_list' %}"
-                class="back-btn"
-            >
-
-                <i class="bi bi-arrow-left"></i>
-
-                Back
-
-            </a>
-
-        </div>
-
+        <h3 class="fw-bold mb-0">
+          UGX {{ customer.current_balance|floatformat:0 }}
+        </h3>
+      </div>
     </div>
 
+    <!-- ACTION BUTTONS -->
 
-    <!-- DEPOSIT HISTORY -->
-    
+    <div class="d-flex flex-wrap gap-3 mt-4">
+      <a href="{% url 'record_deposit' customer.id %}" class="save-btn">
+        <i class="bi bi-plus-circle me-2"></i>
 
-    <div class="custom-card mb-4">
+        Add Deposit
+      </a>
 
-        <div class="d-flex justify-content-between align-items-center mb-3">
+      <a href="{% url 'withdraw_goods' customer.id %}" class="btn btn-warning">
+        <i class="bi bi-box-arrow-up-right me-2"></i>
 
-            <h4 class="fw-bold mb-0">
-                Deposit History
-            </h4>
+        Withdraw Goods
+      </a>
 
-        </div>
+      <a
+        href="{% url 'edit_customer' customer.id %}"
+        class="btn btn-outline-light"
+      >
+        <i class="bi bi-pencil me-2"></i>
 
-        <div class="table-responsive">
+        Edit Customer
+      </a>
 
-            <table class="table align-middle">
+      <a href="{% url 'customer_list' %}" class="back-btn">
+        <i class="bi bi-arrow-left"></i>
 
-                <thead>
+        Back
+      </a>
+    </div>
+  </div>
 
-                    <tr>
+  <!-- DEPOSIT HISTORY -->
 
-                        <th>Date</th>
-
-                        <th>Amount</th>
-
-                        <th>Receipt #</th>
-
-                        <th>Print</th>
-
-                    </tr>
-
-                </thead>
-
-                <tbody>
-
-                    {% for d in deposits %}
-
-                        <tr>
-
-                            <td>
-                                {{ d.date_deposited|date:"Y-m-d" }}
-                            </td>
-
-                            <td>
-                                UGX {{ d.amount|floatformat:0 }}
-                            </td>
-
-                            <td>
-                                {{ d.temporary_receipt_number }}
-                            </td>
-
-                            <td>
-
-                                <a
-                                    href="{% url 'print_receipt' d.id %}"
-                                    class="btn btn-info btn-sm"
-                                    target="_blank"
-                                >
-
-                                    <i class="bi bi-printer"></i>
-
-                                    Print
-
-                                </a>
-
-                            </td>
-
-                        </tr>
-
-                    {% empty %}
-
-                        <tr>
-
-                            <td colspan="4" class="text-center text-muted py-4">
-
-                                No deposits recorded
-
-                            </td>
-
-                        </tr>
-
-                    {% endfor %}
-
-                </tbody>
-
-            </table>
-
-        </div>
-
+  <div class="custom-card mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h4 class="fw-bold mb-0">Deposit History</h4>
     </div>
 
+    <div class="table-responsive">
+      <table class="table align-middle">
+        <thead>
+          <tr>
+            <th>Date</th>
 
-    
-    <!-- WITHDRAWALS -->
+            <th>Amount</th>
 
-    <div class="custom-card">
+            <th>Receipt #</th>
 
-        <h4 class="fw-bold mb-3">
+            <th>Print</th>
+          </tr>
+        </thead>
 
-            Goods Withdrawn
+        <tbody>
+          {% for d in deposits %}
 
-        </h4>
+          <tr>
+            <td>{{ d.date_deposited|date:"Y-m-d" }}</td>
 
-        <div class="table-responsive">
+            <td>UGX {{ d.amount|floatformat:0 }}</td>
 
-            <table class="table align-middle">
+            <td>{{ d.temporary_receipt_number }}</td>
 
-                <thead>
+            <td>
+              <a
+                href="{% url 'print_receipt' d.id %}"
+                class="btn btn-info btn-sm"
+                target="_blank"
+              >
+                <i class="bi bi-printer"></i>
 
-                    <tr>
+                Print
+              </a>
+            </td>
+          </tr>
 
-                        <th>Date</th>
+          {% empty %}
 
-                        <th>Product</th>
+          <tr>
+            <td colspan="4" class="text-center text-muted py-4">
+              No deposits recorded
+            </td>
+          </tr>
 
-                        <th>Quantity</th>
-
-                        <th>Value</th>
-
-                    </tr>
-
-                </thead>
-
-                <tbody>
-
-                    {% for w in withdrawals %}
-
-                        <tr>
-
-                            <td>
-                                {{ w.date_withdrawn|date:"Y-m-d" }}
-                            </td>
-
-                            <td>
-                                {{ w.product.name }}
-                            </td>
-
-                            <td>
-                                {{ w.quantity }}
-                            </td>
-
-                            <td>
-                                UGX {{ w.value_deducted|floatformat:0 }}
-                            </td>
-
-                        </tr>
-
-                    {% empty %}
-
-                        <tr>
-
-                            <td colspan="4" class="text-center text-muted py-4">
-
-                                No withdrawals recorded
-
-                            </td>
-
-                        </tr>
-
-                    {% endfor %}
-
-                </tbody>
-
-            </table>
-
-        </div>
-
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
+  </div>
 
+  <!-- WITHDRAWALS -->
+
+  <div class="custom-card">
+    <h4 class="fw-bold mb-3">Goods Withdrawn</h4>
+
+    <div class="table-responsive">
+      <table class="table align-middle">
+        <thead>
+          <tr>
+            <th>Date</th>
+
+            <th>Product</th>
+
+            <th>Quantity</th>
+
+            <th>Value</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {% for w in withdrawals %}
+
+          <tr>
+            <td>{{ w.date_withdrawn|date:"Y-m-d" }}</td>
+
+            <td>{{ w.product.name }}</td>
+
+            <td>{{ w.quantity }}</td>
+
+            <td>UGX {{ w.value_deducted|floatformat:0 }}</td>
+          </tr>
+
+          {% empty %}
+
+          <tr>
+            <td colspan="4" class="text-center text-muted py-4">
+              No withdrawals recorded
+            </td>
+          </tr>
+
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>
 
 {% endblock %}
-

@@ -170,6 +170,8 @@ urlpatterns = [
         name='reports'
     ),
 
+# SUPPLIER PAYMENT
+path('supplier/<int:supplier_id>/pay/', views.pay_supplier, name='pay_supplier'),
 
     
 ]

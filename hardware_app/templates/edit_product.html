@@ -1,234 +1,249 @@
-{% extends 'base.html' %}
-
-{% block content %}
+{% extends 'base.html' %} {% block content %}
 
 <!-- PAGE HEADER -->
 
-<div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+<div
+  class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4"
+>
+  <div>
+    <h2 class="fw-bold text-light mb-1">Edit Product</h2>
 
-    <div>
+    <p class="text-muted mb-0">
+      Update product information and inventory settings
+    </p>
+  </div>
 
-        <h2 class="fw-bold text-light mb-1">
+  <!-- BACK BUTTON -->
 
-            Edit Product
+  <a href="{% url 'product_list' %}" class="back-btn">
+    <i class="bi bi-arrow-left"></i>
 
-        </h2>
-
-        <p class="text-muted mb-0">
-
-            Update product information and inventory settings
-
-        </p>
-
-    </div>
-
-
-    <!-- BACK BUTTON -->
-
-    <a
-        href="{% url 'product_list' %}"
-        class="back-btn"
-    >
-
-        <i class="bi bi-arrow-left"></i>
-
-        Products
-
-    </a>
-
+    Products
+  </a>
 </div>
-
 
 <!-- FORM CARD -->
 
 <div class="custom-card">
-
-    <form method="POST">
-
-        {% csrf_token %}
-
-        <div class="row">
-
-            <!-- PRODUCT NAME -->
-
-            <div class="col-md-6 mb-4">
-
-                <label class="custom-label">
-
-                    Product Name
-
-                </label>
-
-                <input
-                    type="text"
-                    name="name"
-                    value="{{ product.name }}"
-                    class="custom-input"
-                >
-
-            </div>
-
-
-            <!-- SPECIFICATION -->
-
-            <div class="col-md-6 mb-4">
-
-                <label class="custom-label">
-
-                    Specification
-
-                </label>
-
-                <input
-                    type="text"
-                    name="specification"
-                    value="{{ product.specification }}"
-                    class="custom-input"
-                >
-
-            </div>
-
-
-            <!-- CATEGORY -->
-
-            <div class="col-md-6 mb-4">
-
-                <label class="custom-label">
-
-                    Category
-
-                </label>
-
-                <select
-                    name="category"
-                    class="custom-input"
-                >
-
-                    <option value="cement" {% if product.category == 'cement' %}selected{% endif %}>
-                        Cement
-                    </option>
-
-                    <option value="iron_bar" {% if product.category == 'iron_bar' %}selected{% endif %}>
-                        Iron Bar
-                    </option>
-
-                    <option value="nail" {% if product.category == 'nail' %}selected{% endif %}>
-                        Nail
-                    </option>
-
-                    <option value="wheelbarrow" {% if product.category == 'wheelbarrow' %}selected{% endif %}>
-                        Wheelbarrow
-                    </option>
-
-                    <option value="wire_mesh" {% if product.category == 'wire_mesh' %}selected{% endif %}>
-                        Wire Mesh
-                    </option>
-
-                    <option value="barbed_wire" {% if product.category == 'barbed_wire' %}selected{% endif %}>
-                        Barbed Wire
-                    </option>
-
-                    <option value="iron_sheet" {% if product.category == 'iron_sheet' %}selected{% endif %}>
-                        Iron Sheet
-                    </option>
-
-                </select>
-
-            </div>
-
-
-            <!-- UNIT -->
-
-            <div class="col-md-6 mb-4">
-
-                <label class="custom-label">
-
-                    Unit
-
-                </label>
-
-                <select
-                    name="unit"
-                    class="custom-input"
-                >
-
-                    <option value="bag" {% if product.unit == 'bag' %}selected{% endif %}>
-                        Bag
-                    </option>
-
-                    <option value="piece" {% if product.unit == 'piece' %}selected{% endif %}>
-                        Piece
-                    </option>
-
-                    <option value="kg" {% if product.unit == 'kg' %}selected{% endif %}>
-                        Kilogram
-                    </option>
-
-                    <option value="meter" {% if product.unit == 'meter' %}selected{% endif %}>
-                        Meter
-                    </option>
-
-                    <option value="box" {% if product.unit == 'box' %}selected{% endif %}>
-                        Box
-                    </option>
-
-                </select>
-
-            </div>
-
-
-            <!-- REORDER LEVEL -->
-
-            <div class="col-md-6 mb-2">
-
-                <label class="custom-label">
-
-                    Reorder Level
-
-                </label>
-
-                <input
-                    type="number"
-                    name="reorder_level"
-                    value="{{ product.reorder_level }}"
-                    class="custom-input"
-                >
-
-            </div>
-
-        </div>
-
-
-        <!-- BUTTONS -->
-
-        <div class="d-flex justify-content-end gap-3 flex-wrap mt-4">
-
-            <a
-                href="{% url 'product_list' %}"
-                class="back-btn"
-            >
-
-                Cancel
-
-            </a>
-
-
-            <button
-                type="submit"
-                class="save-btn"
-            >
-
-                <i class="bi bi-check-circle me-2"></i>
-
-                Save Changes
-
-            </button>
-
-        </div>
-
-    </form>
-
+  <form method="POST">
+    {% csrf_token %}
+
+    <div class="row">
+      <!-- PRODUCT NAME -->
+
+      <div class="col-md-6 mb-4">
+        <label class="custom-label"> Product Name </label>
+
+        <input
+          type="text"
+          name="name"
+          value="{{ product.name }}"
+          class="custom-input"
+        />
+      </div>
+
+      <!-- SPECIFICATION -->
+
+      <div class="col-md-6 mb-4">
+        <label class="custom-label"> Specification </label>
+
+        <input
+          type="text"
+          name="specification"
+          value="{{ product.specification }}"
+          class="custom-input"
+        />
+      </div>
+
+      <!-- CATEGORY -->
+
+      <div class="col-md-6 mb-4">
+        <label class="custom-label"> Category </label>
+
+        <select name="category" class="custom-input">
+          <option
+            value="cement"
+            {%
+            if
+            product.category=""
+            ="cement"
+            %}selected{%
+            endif
+            %}
+          >
+            Cement
+          </option>
+
+          <option
+            value="iron_bar"
+            {%
+            if
+            product.category=""
+            ="iron_bar"
+            %}selected{%
+            endif
+            %}
+          >
+            Iron Bar
+          </option>
+
+          <option
+            value="nail"
+            {%
+            if
+            product.category=""
+            ="nail"
+            %}selected{%
+            endif
+            %}
+          >
+            Nail
+          </option>
+
+          <option
+            value="wheelbarrow"
+            {%
+            if
+            product.category=""
+            ="wheelbarrow"
+            %}selected{%
+            endif
+            %}
+          >
+            Wheelbarrow
+          </option>
+
+          <option
+            value="wire_mesh"
+            {%
+            if
+            product.category=""
+            ="wire_mesh"
+            %}selected{%
+            endif
+            %}
+          >
+            Wire Mesh
+          </option>
+
+          <option
+            value="barbed_wire"
+            {%
+            if
+            product.category=""
+            ="barbed_wire"
+            %}selected{%
+            endif
+            %}
+          >
+            Barbed Wire
+          </option>
+
+          <option
+            value="iron_sheet"
+            {%
+            if
+            product.category=""
+            ="iron_sheet"
+            %}selected{%
+            endif
+            %}
+          >
+            Iron Sheet
+          </option>
+        </select>
+      </div>
+
+      <!-- UNIT -->
+
+      <div class="col-md-6 mb-4">
+        <label class="custom-label"> Unit </label>
+
+        <select name="unit" class="custom-input">
+          <option
+            value="bag"
+            {%
+            if
+            product.unit=""
+            ="bag"
+            %}selected{%
+            endif
+            %}
+          >
+            Bag
+          </option>
+
+          <option
+            value="piece"
+            {%
+            if
+            product.unit=""
+            ="piece"
+            %}selected{%
+            endif
+            %}
+          >
+            Piece
+          </option>
+
+          <option value="kg" {% if product.unit == 'kg' %}selected{% endif %}>
+            Kilogram
+          </option>
+
+          <option
+            value="meter"
+            {%
+            if
+            product.unit=""
+            ="meter"
+            %}selected{%
+            endif
+            %}
+          >
+            Meter
+          </option>
+
+          <option
+            value="box"
+            {%
+            if
+            product.unit=""
+            ="box"
+            %}selected{%
+            endif
+            %}
+          >
+            Box
+          </option>
+        </select>
+      </div>
+
+      <!-- REORDER LEVEL -->
+
+      <div class="col-md-6 mb-2">
+        <label class="custom-label"> Reorder Level </label>
+
+        <input
+          type="number"
+          name="reorder_level"
+          value="{{ product.reorder_level }}"
+          class="custom-input"
+        />
+      </div>
+    </div>
+
+    <!-- BUTTONS -->
+
+    <div class="d-flex justify-content-end gap-3 flex-wrap mt-4">
+      <a href="{% url 'product_list' %}" class="back-btn"> Cancel </a>
+
+      <button type="submit" class="save-btn">
+        <i class="bi bi-check-circle me-2"></i>
+
+        Save Changes
+      </button>
+    </div>
+  </form>
 </div>
 
 {% endblock %}
-

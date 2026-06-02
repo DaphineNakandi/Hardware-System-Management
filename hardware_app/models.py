@@ -238,7 +238,7 @@ class Sale(models.Model):
         ('cash', 'Cash'),
         ('mobile_money', 'Mobile Money'),
         ('bank', 'Bank'),
-        ('credit', 'Credit'),
+        # ('credit', 'Credit'),
     ]
 
     product = models.ForeignKey(Product, on_delete=models.CASCADE)

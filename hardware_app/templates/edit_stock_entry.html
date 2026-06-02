@@ -1,94 +1,56 @@
-{% extends 'base.html' %}
-
-{% block content %}
+{% extends 'base.html' %} {% block content %}
 
 <div class="container mt-4">
+  <!-- PAGE HEADER -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold text-light mb-1">Edit Stock Entry</h2>
 
-    <!-- PAGE HEADER -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+      <p class="text-muted mb-0">Product: {{ entry.product.name }}</p>
+    </div>
 
-        <div>
+    <a href="{% url 'stock_history' entry.product.id %}" class="back-btn">
+      <i class="bi bi-arrow-left"></i>
 
-            <h2 class="fw-bold text-light mb-1">
-                Edit Stock Entry
-            </h2>
+      Back
+    </a>
+  </div>
 
-            <p class="text-muted mb-0">
-                Product: {{ entry.product.name }}
-            </p>
+  <!-- FORM CARD -->
+  <div class="custom-card">
+    <form method="POST">
+      {% csrf_token %}
 
+      <div class="row">
+        {% for field in form %}
+
+        <div class="col-md-6 mb-4">
+          <label class="custom-label"> {{ field.label }} </label>
+
+          {{ field }} {% if field.help_text %}
+          <small class="form-text"> {{ field.help_text }} </small>
+          {% endif %} {% for error in field.errors %}
+          <div class="error-message">{{ error }}</div>
+          {% endfor %}
         </div>
 
-        <a href="{% url 'stock_history' entry.product.id %}" class="back-btn">
+        {% endfor %}
+      </div>
 
-            <i class="bi bi-arrow-left"></i>
-
-            Back
-
+      <!-- BUTTONS -->
+      <div class="d-flex justify-content-end gap-2 mt-4">
+        <a href="{% url 'stock_history' entry.product.id %}" class="cancel-btn">
+          Cancel
         </a>
 
-    </div>
+        <button type="submit" class="save-btn">
+          <i class="bi bi-check-circle me-2"></i>
 
-    <!-- FORM CARD -->
-    <div class="custom-card">
-
-        <form method="POST">
-
-            {% csrf_token %}
-
-            <div class="row">
-
-                {% for field in form %}
-
-                <div class="col-md-6 mb-4">
-
-                    <label class="custom-label">
-
-                        {{ field.label }}
-
-                    </label>
-
-                    {{ field }}
-
-                    {% if field.help_text %}
-                        <small class="form-text">
-                            {{ field.help_text }}
-                        </small>
-                    {% endif %}
-
-                    {% for error in field.errors %}
-                        <div class="error-message">
-                            {{ error }}
-                        </div>
-                    {% endfor %}
-
-                </div>
-
-                {% endfor %}
-
-            </div>
-
-            <!-- BUTTONS -->
-            <div class="d-flex justify-content-end gap-2 mt-4">
-
-                <a href="{% url 'stock_history' entry.product.id %}" class="cancel-btn">
-                    Cancel
-                </a>
-
-                <button type="submit" class="save-btn">
-
-                    <i class="bi bi-check-circle me-2"></i>
-
-                    Save Changes
-
-                </button>
-
-            </div>
-
-        </form>
-
-    </div>
-
+          Save Changes
+        </button>
+      </div>
+    </form>
+  </div>
 </div>
 
 {% endblock %}

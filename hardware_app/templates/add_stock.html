@@ -1,175 +1,91 @@
-
-{% extends 'base.html' %}
-
-
-{% block content %}
+{% extends 'base.html' %} {% block content %}
 
 <div class="container mt-4">
+  <!-- PAGE HEADER -->
 
-    
-    <!-- PAGE HEADER -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h3 class="fw-bold text-light">Add Stock</h3>
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
+      <p class="text-muted mb-0">Product: {{ product.name }}</p>
+    </div>
 
-        <div>
+    <a href="{% url 'product_list' %}" class="back-btn">
+      <i class="bi bi-arrow-left"></i>
 
-            <h3 class="fw-bold text-light">
-                Add Stock
-            </h3>
+      Back
+    </a>
+  </div>
 
-            <p class="text-muted mb-0">
-                Product: {{ product.name }}
-            </p>
+  <!-- FORM CARD -->
 
+  <div class="custom-card">
+    <form method="POST" novalidate>
+      {% csrf_token %}
+
+      <div class="row g-4">
+        <!-- QUANTITY -->
+
+        <div class="col-md-4">
+          <label class="custom-label"> Quantity </label>
+
+          {{ form.quantity }} {% if form.quantity.errors %}
+          <div class="error-message">{{ form.quantity.errors }}</div>
+          {% endif %}
         </div>
 
-        <a
-            href="{% url 'product_list' %}"
-            class="back-btn"
-        >
+        <!-- COST PRICE -->
 
-            <i class="bi bi-arrow-left"></i>
+        <div class="col-md-4">
+          <label class="custom-label"> Cost Price (UGX) </label>
 
-            Back
+          {{ form.cost_price }} {% if form.cost_price.errors %}
+          <div class="error-message">{{ form.cost_price.errors }}</div>
+          {% endif %}
+        </div>
 
-        </a>
+        <!-- SELLING PRICE -->
 
-    </div>
+        <div class="col-md-4">
+          <label class="custom-label"> Selling Price (UGX) </label>
 
+          {{ form.selling_price }} {% if form.selling_price.errors %}
+          <div class="error-message">{{ form.selling_price.errors }}</div>
+          {% endif %}
+        </div>
 
+        <!-- SUPPLIER -->
 
-    <!-- FORM CARD -->
+        <div class="col-md-6">
+          <label class="custom-label"> Supplier </label>
 
-    <div class="custom-card">
+          {{ form.supplier }} {% if form.supplier.errors %}
+          <div class="error-message">{{ form.supplier.errors }}</div>
+          {% endif %}
+        </div>
 
-        <form method="POST">
+        <!-- PAYMENT METHOD -->
 
-            {% csrf_token %}
+        <div class="col-md-6">
+          <label class="custom-label"> Payment Method </label>
 
-            
-            <div class="row g-4">
+          {{ form.payment_method }} {% if form.payment_method.errors %}
+          <div class="error-message">{{ form.payment.errors }}</div>
+          {% endif %}
+        </div>
+      </div>
 
+      <!-- SUBMIT BUTTON -->
 
-                <!-- QUANTITY -->
+      <div class="mt-4 d-flex justify-content-end">
+        <button type="submit" class="save-btn">
+          <i class="bi bi-check-circle me-2"></i>
 
-                <div class="col-md-4">
-
-                    <label class="custom-label">
-                        Quantity
-                    </label>
-
-                    {{ form.quantity }}
-
-                    {% if form.quantity.errors %}
-                        <div class="error-message">
-                            {{ form.quantity.errors }}
-                        </div>
-                    {% endif %}
-
-                </div>
-
-
-                <!-- COST PRICE -->
-
-                <div class="col-md-4">
-
-                    <label class="custom-label">
-                        Cost Price (UGX)
-                    </label>
-
-                    {{ form.cost_price }}
-
-                    {% if form.cost_price.errors %}
-                        <div class="error-message">
-                            {{ form.cost_price.errors }}
-                        </div>
-                    {% endif %}
-
-                </div>
-
-
-                <!-- SELLING PRICE -->
-
-                <div class="col-md-4">
-
-                    <label class="custom-label">
-                        Selling Price (UGX)
-                    </label>
-
-                    {{ form.selling_price }}
-
-                    {% if form.selling_price.errors %}
-                        <div class="error-message">
-                            {{ form.selling_price.errors }}
-                        </div>
-                    {% endif %}
-
-                </div>
-
-
-                <!-- SUPPLIER -->
-
-                <div class="col-md-6">
-
-                    <label class="custom-label">
-                        Supplier
-                    </label>
-
-                    {{ form.supplier }}
-
-                    {% if form.supplier.errors %}
-                        <div class="error-message">
-                            {{ form.supplier.errors }}
-                        </div>
-                    {% endif %}
-
-                </div>
-
-
-                <!-- PAYMENT METHOD -->
-
-                <div class="col-md-6">
-
-                    <label class="custom-label">
-                        Payment Method
-                    </label>
-
-                    {{ form.payment }}
-
-                    {% if form.payment.errors %}
-                        <div class="error-message">
-                            {{ form.payment.errors }}
-                        </div>
-                    {% endif %}
-
-                </div>
-
-            </div>
-
-
-        
-            <!-- SUBMIT BUTTON -->
-
-            <div class="mt-4 d-flex justify-content-end">
-
-                <button
-                    type="submit"
-                    class="save-btn"
-                >
-
-                    <i class="bi bi-check-circle me-2"></i>
-
-                    Save Stock Entry
-
-                </button>
-
-            </div>
-
-        </form>
-
-    </div>
-
+          Save Stock Entry
+        </button>
+      </div>
+    </form>
+  </div>
 </div>
 
 {% endblock %}
-

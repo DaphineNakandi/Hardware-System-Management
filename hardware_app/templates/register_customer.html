@@ -1,192 +1,150 @@
-{% extends 'base.html' %}
-
-{% block content %}
+{% extends 'base.html' %} {% block content %}
 
 <div class="container mt-4">
+  <!-- HEADER -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold text-light mb-1">Register Customer</h2>
 
-    <!-- HEADER -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+      <p class="text-secondary mb-0">Add a new deposit scheme customer</p>
+    </div>
 
-        <div>
-            <h2 class="fw-bold text-light mb-1">
-                Register Customer
-            </h2>
+    <a href="{% url 'customer_list' %}" class="back-btn">
+      <i class="bi bi-arrow-left"></i>
+      Customers
+    </a>
+  </div>
 
-            <p class="text-secondary mb-0">
-                Add a new deposit scheme customer
-            </p>
+  <!-- FORM CARD -->
+  <div class="custom-card">
+    <form method="POST" novalidate>
+      {% csrf_token %} {% if form.errors %}
+      <div class="alert alert-danger">
+        {% for field, errors in form.errors.items %} {% for error in errors %}
+        <p><strong>{{ field|title }}:</strong> {{ error }}</p>
+        {% endfor %} {% endfor %}
+      </div>
+      {% endif %}
+
+      <div class="row">
+        <!-- FULL NAME -->
+        <div class="col-md-6 mb-4">
+          <label class="custom-label"> Full Name (as on ID) </label>
+
+          <input
+            type="text"
+            name="full_name"
+            class="custom-input"
+            placeholder="Candy Toblerone Murunji"
+            value="{{ form.full_name.value|default:'' }}"
+          />
+
+          <!-- show errors -->
+          {% if form.full_name.errors %}
+          <div class="alert alert-danger mt-2">
+            {% for error in form.full_name.errors %}
+            <p>{{ error }}</p>
+            {% endfor %}
+          </div>
+          {% endif %}
         </div>
 
-        <a href="{% url 'customer_list' %}" class="back-btn">
-            <i class="bi bi-arrow-left"></i>
-            Customers
-        </a>
+        <!-- NIN -->
+        <div class="col-md-6 mb-4">
+          <label class="custom-label"> National ID Number (NIN) </label>
 
-    </div>
+          <input
+            type="text"
+            name="nin"
+            class="custom-input"
+            placeholder="CM1234567890AB"
+            value="{{ form.nin.value|default:'' }}"
+          />
 
-    <!-- FORM CARD -->
-    <div class="custom-card">
+          <small class="form-text"> Example: CM1234567890AB </small>
+          {% if form.nin.errors %}
+          <div class="alert alert-danger mt-2">
+            {% for error in form.nin.errors %}
+            <p>{{ error }}</p>
+            {% endfor %}
+          </div>
+          {% endif %}
+        </div>
 
-        <form method="POST" novalidate>
+        <!-- PHONE -->
+        <div class="col-md-6 mb-4">
+          <label class="custom-label"> Phone Number </label>
 
-            {% csrf_token %}
+          <input
+            type="tel"
+            name="phone"
+            class="custom-input"
+            placeholder="0772123456"
+          />
 
-            {% if form.errors %}
-                <div class="alert alert-danger">
-                    {% for field, errors in form.errors.items %}
-                        {% for error in errors %}
-                        <p><strong>{{ field|title }}:</strong> {{ error }}</p>
-                    {% endfor %}
-                    {% endfor %}
-                </div>
-            {% endif %}
+          <small class="form-text"> Example: 0772123456 </small>
+          {% if form.phone.errors %}
+          <div class="alert alert-danger mt-2">
+            {% for error in form.phone.errors %}
+            <p>{{ error }}</p>
+            {% endfor %}
+          </div>
+          {% endif %}
+        </div>
 
-            <div class="row">
+        <!-- EMPLOYER -->
+        <div class="col-md-6 mb-4">
+          <label class="custom-label"> Employer (Optional) </label>
 
-                <!-- FULL NAME -->
-                <div class="col-md-6 mb-4">
-                    <label class="custom-label">
-                        Full Name (as on ID)
-                    </label>
+          <input
+            type="text"
+            name="employer"
+            class="custom-input"
+            placeholder="Company Name"
+            value="{{ form.employer.value|default:'' }}"
+          />
+          {% if form.employer.errors %}
+          <div class="alert alert-danger mt-2">
+            {% for error in form.employer.errors %}
+            <p>{{ error }}</p>
+            {% endfor %}
+          </div>
+          {% endif %}
+        </div>
 
-                    <input
-                        type="text"
-                        name="full_name"
-                        class="custom-input"
-                        placeholder="Candy Toblerone Murunji"
-                        value="{{ form.full_name.value|default:'' }}"
-                       
-                    >
+        <!-- SALARY -->
+        <div class="col-md-6 mb-2">
+          <label class="custom-label"> Monthly Salary (UGX) </label>
 
-                    <!-- show errors -->
-                     {% if form.full_name.errors %}
-                        <div class="alert alert-danger mt-2">
-                            {% for error in form.full_name.errors %}
-                                <p>{{ error }}</p>
-                            {% endfor %}
-                        </div>
-                     {% endif %}
-                </div>
+          <input
+            type="number"
+            name="monthly_salary"
+            class="custom-input"
+            value="0"
+            step="1000"
+          />
+          {% if form.monthly_salary.errors %}
+          <div class="alert alert-danger mt-2">
+            {% for error in form.monthly_salary.errors %}
+            <p>{{ error }}</p>
+            {% endfor %}
+          </div>
+          {% endif %}
+        </div>
+      </div>
 
-                <!-- NIN -->
-                <div class="col-md-6 mb-4">
-                    <label class="custom-label">
-                        National ID Number (NIN)
-                    </label>
+      <!-- BUTTONS -->
+      <div class="d-flex justify-content-end gap-3 mt-4">
+        <a href="{% url 'customer_list' %}" class="cancel-btn"> Cancel </a>
 
-                    <input
-                        type="text"
-                        name="nin"
-                        class="custom-input"
-                        placeholder="CM1234567890AB"
-                        value="{{ form.nin.value|default:'' }}"
-                    >
+        <button type="submit" class="save-btn">
+          <i class="bi bi-person-plus me-2"></i>
 
-                    <small class="form-text">
-                        Example: CM1234567890AB
-                    </small>
-                    {% if form.nin.errors %}
-                        <div class="alert alert-danger mt-2">
-                            {% for error in form.nin.errors %}
-                                <p>{{ error }}</p>
-                            {% endfor %}
-                        </div>
-                     {% endif %}
-                </div>
-
-                <!-- PHONE -->
-                <div class="col-md-6 mb-4">
-                    <label class="custom-label">
-                        Phone Number
-                    </label>
-
-                    <input
-                        type="tel"
-                        name="phone"
-                        class="custom-input"
-                        placeholder="0772123456"
-                        
-                    >
-
-                    <small class="form-text">
-                        Example: 0772123456
-                    </small>
-                    {% if form.phone.errors %}
-                        <div class="alert alert-danger mt-2">
-                            {% for error in form.phone.errors %}
-                                <p>{{ error }}</p>
-                            {% endfor %}
-                        </div>
-                     {% endif %}
-                </div>
-
-                <!-- EMPLOYER -->
-                <div class="col-md-6 mb-4">
-                    <label class="custom-label">
-                        Employer (Optional)
-                    </label>
-
-                    <input
-                        type="text"
-                        name="employer"
-                        class="custom-input"
-                        placeholder="Company Name"
-                        value="{{ form.employer.value|default:'' }}"
-                    >
-                    {% if form.employer.errors %}
-                        <div class="alert alert-danger mt-2">
-                            {% for error in form.employer.errors %}
-                                <p>{{ error }}</p>
-                            {% endfor %}
-                        </div>
-                     {% endif %}
-                </div>
-
-                <!-- SALARY -->
-                <div class="col-md-6 mb-2">
-                    <label class="custom-label">
-                        Monthly Salary (UGX)
-                    </label>
-
-                    <input
-                        type="number"
-                        name="monthly_salary"
-                        class="custom-input"
-                        value="0"
-                        step="1000"
-                    >
-                    {% if form.monthly_salary.errors %}
-                        <div class="alert alert-danger mt-2">
-                            {% for error in form.monthly_salary.errors %}
-                                <p>{{ error }}</p>
-                            {% endfor %}
-                        </div>
-                     {% endif %}
-                </div>
-
-            </div>
-
-            <!-- BUTTONS -->
-            <div class="d-flex justify-content-end gap-3 mt-4">
-
-                <a href="{% url 'customer_list' %}" class="cancel-btn">
-                    Cancel
-                </a>
-
-                <button type="submit" class="save-btn">
-
-                    <i class="bi bi-person-plus me-2"></i>
-
-                    Register Customer
-
-                </button>
-
-            </div>
-
-        </form>
-
-    </div>
-
+          Register Customer
+        </button>
+      </div>
+    </form>
+  </div>
 </div>
 
 {% endblock %}

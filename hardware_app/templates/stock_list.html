@@ -1,8 +1,6 @@
-{% extends 'base.html' %}
-{% block content %}
+{% extends 'base.html' %} {% block content %}
 
 <div class="container mt-4">
-
   <!-- HEADER -->
   <div class="d-flex justify-content-between align-items-start mb-4">
     <div>
@@ -47,12 +45,10 @@
               <td>{{ entry.supplier|default:"-" }}</td>
               <td>
                 <span class="badge bg-secondary">
-                  {{ entry.payment|default:"-" }}
+                  {{ entry.payment_method|default:"-" }}
                 </span>
               </td>
-              <td class="text-muted">
-                {{ entry.date_received|date:"Y-m-d" }}
-              </td>
+              <td class="text-muted">{{ entry.date_received|date:"Y-m-d" }}</td>
             </tr>
             {% empty %}
             <tr>
@@ -64,7 +60,6 @@
           </tbody>
         </table>
       </div>
-
     </div>
   </div>
 
@@ -93,12 +88,10 @@
               <td>UGX {{ sale.transport|default:"0"|floatformat:0 }}</td>
               <td>
                 <span class="badge bg-info text-dark">
-                  {{ sale.paymentmethod }}
+                  {{ sale.payment_method }}
                 </span>
               </td>
-              <td class="text-muted">
-                {{ sale.date_sold|date:"Y-m-d" }}
-              </td>
+              <td class="text-muted">{{ sale.date_sold|date:"Y-m-d" }}</td>
             </tr>
             {% empty %}
             <tr>
@@ -110,10 +103,8 @@
           </tbody>
         </table>
       </div>
-
     </div>
   </div>
-
 </div>
 
 {% endblock %}

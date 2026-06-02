@@ -1,230 +1,81 @@
 {% extends 'base.html' %}
+{% load humanize %}
 
 {% block content %}
 
 <div class="container mt-4">
-
-    
-    <!-- PAGE HEADER -->
-
-    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
-
+    <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-
-            <h2 class="fw-bold text-light mb-1">
-                Deposit Scheme Customers
-            </h2>
-
-            <p class="text-muted mb-0">
-                Manage customer deposits and withdrawals
-            </p>
-
+            <h2>Deposit Scheme Customers</h2>
+            <p class="text-muted">Manage salary earner customers</p>
         </div>
-
-
-        <!-- REGISTER BUTTON -->
-
-        {% if user.is_superuser or user.groups.all.0.name == 'Manager' or user.groups.all.0.name == 'Credit Officer' %}
-
-            <a
-                href="{% url 'register_customer' %}"
-                class="save-btn"
-            >
-
-                <i class="bi bi-person-plus me-2"></i>
-
-                Register Customer
-
-            </a>
-
-        {% endif %}
-
+        <a href="{% url 'register_customer' %}" class="btn btn-success">+ Register New</a>
     </div>
 
-
-    
-    <!-- SUMMARY CARDS -->
-
+    <!-- Summary Cards -->
     <div class="row mb-4">
-
-        <!-- TOTAL CUSTOMERS -->
-
-        <div class="col-md-4 mb-3">
-
-            <div class="card stat-card">
-
+        <div class="col-md-4">
+            <div class="card text-center">
                 <div class="card-body">
-
-                    <small class="fw-semibold">
-                        Total Customers
-                    </small>
-
-                    <h2 class="fw-bold">
-                        {{ total_customers }}
-                    </h2>
-
+                    <h3>{{ total_customers }}</h3>
+                    <p>Total Customers</p>
                 </div>
-
             </div>
-
         </div>
-
-
-        <!-- TOTAL DEPOSITS -->
-
-        <div class="col-md-4 mb-3">
-
-            <div class="card stat-card">
-
+        <div class="col-md-4">
+            <div class="card text-center">
                 <div class="card-body">
-
-                    <small class="fw-semibold">
-                        Total Deposits
-                    </small>
-
-                    <h4 class="fw-bold">
-                        UGX {{ total_deposits|floatformat:0 }}
-                    </h4>
-
+                    <h3>UGX {{ total_deposits|floatformat:0|intcomma }}</h3>
+                    <p>Total Deposits</p>
                 </div>
-
             </div>
-
         </div>
-
-
-        <!-- TOTAL WITHDRAWALS -->
-
-        <div class="col-md-4 mb-3">
-
-            <div class="card stat-card">
-
+        <div class="col-md-4">
+            <div class="card text-center">
                 <div class="card-body">
-
-                    <small class="fw-semibold">
-                        Total Withdrawals
-                    </small>
-
-                    <h4 class="fw-bold">
-                        UGX {{ total_withdrawals|floatformat:0 }}
-                    </h4>
-
+                    <h3>UGX {{ total_withdrawals|floatformat:0|intcomma }}</h3>
+                    <p>Total Withdrawals</p>
                 </div>
-
             </div>
-
         </div>
-
     </div>
 
-
-    
-    <!-- CUSTOMER TABLE -->
-
-    <div class="custom-card">
-
-        <div class="table-responsive">
-
-            <table class="table align-middle">
-
-                <thead>
-
-                    <tr>
-
-                        <th>Name</th>
-
-                        <th>NIN</th>
-
-                        <th>Phone</th>
-
-                        <th>Deposited</th>
-
-                        <th>Withdrawn</th>
-
-                        <th>Balance</th>
-
-                        <th>Actions</th>
-
-                    </tr>
-
-                </thead>
-
-                <tbody>
-
-                    {% for customer in customers %}
-
-                        <tr>
-
-                            <td class="fw-semibold">
-                                {{ customer.full_name }}
-                            </td>
-
-                            <td>
-                                {{ customer.nin }}
-                            </td>
-
-                            <td>
-                                {{ customer.phone }}
-                            </td>
-
-                            <td>
-                                UGX {{ customer.total_deposited|floatformat:0 }}
-                            </td>
-
-                            <td>
-                                UGX {{ customer.total_withdrawn|floatformat:0 }}
-                            </td>
-
-                            <td>
-
-                                <span class="balance-badge">
-
-                                    UGX {{ customer.current_balance|floatformat:0 }}
-
-                                </span>
-
-                            </td>
-
-                            <td>
-
-                                <a
-                                    href="{% url 'customer_detail' customer.id %}"
-                                    class="btn btn-info btn-sm"
-                                >
-
-                                    <i class="bi bi-eye me-1"></i>
-
-                                    View
-
-                                </a>
-
-                            </td>
-
-                        </tr>
-
-                    {% empty %}
-
-                        <tr>
-
-                            <td colspan="7" class="text-center py-5 text-muted">
-
-                                No customers registered yet
-
-                            </td>
-
-                        </tr>
-
-                    {% endfor %}
-
-                </tbody>
-
-            </table>
-
-        </div>
-
+    <!-- Customers Table -->
+    <div class="table-responsive">
+        <table class="table table-dark">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>NIN</th>
+                    <th>Phone</th>
+                    <th>Deposited</th>
+                    <th>Withdrawn</th>
+                    <th>Balance</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for customer in customers %}
+                <tr>
+                    <td>{{ customer.full_name }}</td>
+                    <td>{{ customer.nin }}</td>
+                    <td>{{ customer.phone }}</td>
+                    <td>UGX {{ customer.total_deposited|floatformat:0|intcomma }}</td>
+                    <td>UGX {{ customer.total_withdrawn|floatformat:0|intcomma }}</td>
+                    <td>UGX {{ customer.current_balance|floatformat:0|intcomma }}</td>
+                    <td>
+                        <a href="{% url 'customer_detail' customer.id %}" class="btn btn-sm btn-info">View</a>
+                        <a href="{% url 'edit_customer' customer.id %}" class="btn btn-sm btn-warning">Edit</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center">No customers yet. <a href="{% url 'register_customer' %}">Add one</a></small>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
-
 </div>
 
 {% endblock %}
-

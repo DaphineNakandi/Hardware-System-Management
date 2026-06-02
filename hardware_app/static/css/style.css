@@ -86,7 +86,7 @@ body {
   font-weight: 600;
 }
 
-/*  STAT CARDS  */
+/*  STAT CARDS - Clean version without gear icons */
 .stat-card {
   background: linear-gradient(135deg, rgba(50, 231, 223, 0.12) 0%, rgba(50, 231, 223, 0.06) 100%);
   border: 1px solid rgba(50, 231, 223, 0.25);
@@ -95,10 +95,14 @@ body {
   backdrop-filter: blur(12px);
   transition: all 0.3s ease;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  min-height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .stat-card:hover {
-   transform: translateY(-5px);
+  transform: translateY(-5px);
   background: linear-gradient(135deg, rgba(50, 231, 223, 0.2) 0%, rgba(50, 231, 223, 0.1) 100%);
   border-color: rgba(50, 231, 223, 0.45);
   box-shadow: 0 12px 30px rgba(50, 231, 223, 0.15);
@@ -106,6 +110,9 @@ body {
 
 .stat-card .card-body {
   padding: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .stat-icon {
@@ -123,7 +130,7 @@ body {
 }
 
 .stat-card:hover .stat-icon {
- background: linear-gradient(135deg, rgba(50, 231, 223, 0.3), rgba(50, 231, 223, 0.18));
+  background: linear-gradient(135deg, rgba(50, 231, 223, 0.3), rgba(50, 231, 223, 0.18));
   color: #7df5f0;
   transform: scale(1.05);
 }
@@ -132,8 +139,9 @@ body {
   color: white;
   font-weight: 800;
   margin-bottom: 8px;
-  font-size: 2rem;
+  font-size: 1.8rem;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  word-break: break-word;
 }
 
 .stat-card .text-muted {
@@ -295,7 +303,7 @@ select option {
   display: inline-block;
 }
 
-/*  LOW STOCK BADGE (KEPT) */
+/*  LOW STOCK BADGE */
 .low-stock-badge {
   background: rgba(239, 68, 68, 0.15);
   color: #f87171;
@@ -766,7 +774,7 @@ select option {
   margin-left: 5px;
 }
 
-/*  STOCK HISTORY PAGE (KEPT) */
+/*  STOCK HISTORY PAGE */
 .history-card {
   background: rgba(255,255,255,0.03);
   border: 1px solid rgba(255,255,255,0.05);
@@ -807,16 +815,16 @@ select option {
 
 /*   PAGE HEADER  */
 .text-light {
-  color: #f8fafc !important;
+  color: #f8fafc;
 }
 
 h2.fw-bold.text-light {
-  color: white !important;
+  color: white;
   font-weight: 800;
 }
 
 p.text-muted {
-  color: #94a3b8 !important;
+  color: #94a3b8;
 }
 
 /*   RESPONSIVE ADJUSTMENTS */

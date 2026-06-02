@@ -1,106 +1,83 @@
 {% extends 'base.html' %}
+{% load humanize %}
 
 {% block content %}
 
 <div class="container mt-4">
+    <h2 class="mb-4">Reports & Analytics</h2>
+    <p class="text-muted mb-4">Inventory, Sales and Customer Analytics Overview</p>
 
-    <!-- HEADER -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-
-        <div>
-            <h2 class="fw-bold text-light mb-1">
-                Reports Dashboard
-            </h2>
-
-            <p class="text-secondary mb-0">
-                Inventory, sales and customer analytics overview
-            </p>
+    <!-- SUMMARY CARDS - ROW 1 -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h3>{{ total_products }}</h3>
+                    <p>Total Products</p>
+                </div>
+            </div>
         </div>
-
+        <div class="col-md-3 mb-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h3>{{ total_customers }}</h3>
+                    <p>Deposit Customers</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h3>UGX {{ total_deposits|floatformat:0|intcomma }}</h3>
+                    <p>Total Deposits</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h3>UGX {{ total_sales|floatformat:0|intcomma }}</h3>
+                    <p>Total Sales Revenue</p>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- STATS -->
+    <!-- SUMMARY CARDS - ROW 2 -->
     <div class="row mb-4">
-
-        <!-- PRODUCTS -->
-        <div class="col-md-3 mb-3">
-            <div class="report-stat-card">
-
-                <div>
-                    <p class="report-label">Products</p>
-                    <h3>{{ total_products }}</h3>
+        <div class="col-md-4 mb-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h3>{{ active_deposit_customers }}</h3>
+                    <p>Active Deposit Customers</p>
                 </div>
-
-                <div class="report-icon">
-                    <i class="bi bi-box-seam"></i>
-                </div>
-
             </div>
         </div>
-
-        <!-- CUSTOMERS -->
-        <div class="col-md-3 mb-3">
-            <div class="report-stat-card">
-
-                <div>
-                    <p class="report-label">Customers</p>
-                    <h3>{{ total_customers }}</h3>
+        <div class="col-md-4 mb-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h3>UGX {{ total_withdrawals|floatformat:0|intcomma }}</h3>
+                    <p>Total Withdrawals</p>
                 </div>
-
-                <div class="report-icon">
-                    <i class="bi bi-people"></i>
-                </div>
-
             </div>
         </div>
-
-        <!-- DEPOSITS -->
-        <div class="col-md-3 mb-3">
-            <div class="report-stat-card">
-
-                <div>
-                    <p class="report-label">Deposits</p>
-                    <h3>UGX {{ total_deposits|floatformat:0 }}</h3>
+        <div class="col-md-4 mb-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h3>UGX {{ total_credit_owed|floatformat:0|intcomma }}</h3>
+                    <p>Supplier Credit Owed</p>
                 </div>
-
-                <div class="report-icon">
-                    <i class="bi bi-wallet2"></i>
-                </div>
-
             </div>
         </div>
-
-        <!-- SALES -->
-        <div class="col-md-3 mb-3">
-            <div class="report-stat-card">
-
-                <div>
-                    <p class="report-label">Sales</p>
-                    <h3>UGX {{ total_sales|floatformat:0 }}</h3>
-                </div>
-
-                <div class="report-icon">
-                    <i class="bi bi-cash-stack"></i>
-                </div>
-
-            </div>
-        </div>
-
     </div>
 
     <!-- LOW STOCK TABLE -->
-    <div class="report-table-panel">
-
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h4 class="text-light mb-0">
-                ⚠️ Low Stock Products
-            </h4>
+    <div class="card mb-4">
+        <div class="card-header">
+            <h4>Low Stock Products</h4>
         </div>
-
-        <div class="table-responsive">
-
-            <table class="report-table">
-
+        <div class="card-body">
+            <table class="table">
                 <thead>
                     <tr>
                         <th>Product</th>
@@ -109,51 +86,86 @@
                         <th>Status</th>
                     </tr>
                 </thead>
-
                 <tbody>
-
-                    {% for p in low_stock_products %}
-
-                    <tr>
-
-                        <td>
-                            {{ p.name }} {{ p.specification }}
-                        </td>
-
-                        <td class="text-danger fw-bold">
-                            {{ p.current_quantity }} {{ p.get_unit_display }}
-                        </td>
-
-                        <td>
-                            {{ p.reorder_level }} {{ p.get_unit_display }}
-                        </td>
-
-                        <td>
-                            <span class="low-stock-badge">
-                                LOW STOCK
-                            </span>
-                        </td>
-
+                    {% for product in low_stock_products %}
+                    <tr class="text-warning">
+                        <td>{{ product.name }} {{ product.specification }}</small>
+                        <td>{{ product.current_quantity }} {{ product.get_unit_display }}</small>
+                        <td>{{ product.reorder_level }} {{ product.get_unit_display }}</small>
+                        <td><span class="badge bg-warning text-dark">LOW STOCK</span></small>
                     </tr>
-
                     {% empty %}
-
-                    <tr>
-                        <td colspan="4" class="text-center py-5 text-secondary">
-                            No low stock items. Good job!
-                        </td>
-                    </tr>
-
+                    <tr><td colspan="4">No low stock items</small></tr>
                     {% endfor %}
-
                 </tbody>
-
             </table>
-
         </div>
-
     </div>
 
+    <!-- TWO COLUMN LAYOUT: Top Products (LEFT) + Sales by Month (RIGHT) -->
+    <div class="row">
+        <!-- LEFT: Top 5 Selling Products -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Top 5 Selling Products</h4>
+                </div>
+                <div class="card-body">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Quantity Sold</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for product_name, qty in top_products %}
+                            <tr>
+                                <td>{{ product_name }}</td>
+                                <td>{{ qty }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="2">No sales data</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT: Sales by Month -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Sales by Month</h4>
+                </div>
+                <div class="card-body">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Month</th>
+                                <th>Total Sales</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for month, total in sales_by_month.items %}
+                            <tr>
+                                <td>{{ month }}</td>
+                                <td>UGX {{ total|floatformat:0|intcomma }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="2">No sales data available</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 {% endblock %}

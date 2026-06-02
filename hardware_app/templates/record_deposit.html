@@ -1,115 +1,77 @@
-{% extends 'base.html' %}
-
-{% block content %}
+{% extends 'base.html' %} {% block content %}
 
 <div class="container mt-4">
+  <!-- PAGE HEADER -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold text-light mb-1">Record Deposit</h2>
 
-    <!-- PAGE HEADER -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+      <p class="text-secondary mb-0">Customer: {{ customer.full_name }}</p>
+    </div>
 
-        <div>
-            <h2 class="fw-bold text-light mb-1">
-                Record Deposit
-            </h2>
+    <a href="{% url 'customer_detail' customer.id %}" class="back-btn">
+      <i class="bi bi-arrow-left"></i>
+      Back
+    </a>
+  </div>
 
-            <p class="text-secondary mb-0">
-                Customer: {{ customer.full_name }}
-            </p>
+  <!-- BALANCE CARD -->
+  <div class="balance-card mb-4">
+    <p class="balance-label">Current Balance</p>
+
+    <h2 class="balance-amount">
+      UGX {{ customer.current_balance|floatformat:0 }}
+    </h2>
+  </div>
+
+  <!-- FORM CARD -->
+  <div class="custom-form-card">
+    <form method="POST" novalidate>
+      {% csrf_token %}
+
+      <div class="row">
+        <!-- AMOUNT -->
+        <div class="col-md-6 mb-4">
+          <label class="custom-label"> Amount (UGX) </label>
+
+          <input
+            type="number"
+            name="amount"
+            class="custom-input"
+            step="0.01"
+            placeholder="Enter amount"
+            required
+          />
         </div>
 
-        <a href="{% url 'customer_detail' customer.id %}" class="back-btn">
-            <i class="bi bi-arrow-left"></i>
-            Back
+        <!-- PAYMENT METHOD -->
+        <div class="col-md-6 mb-4">
+          <label class="custom-label"> Payment Method </label>
+
+          <select name="payment_method" class="custom-input">
+            <option value="cash">Cash</option>
+
+            <option value="mobile_money">Mobile Money</option>
+
+            <option value="bank">Bank Transfer</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- BUTTONS -->
+      <div class="d-flex justify-content-end gap-2 mt-4">
+        <a href="{% url 'customer_detail' customer.id %}" class="cancel-btn">
+          Cancel
         </a>
 
-    </div>
+        <button type="submit" class="save-btn">
+          <i class="bi bi-wallet2 me-2"></i>
 
-    <!-- BALANCE CARD -->
-    <div class="balance-card mb-4">
-
-        <p class="balance-label">
-            Current Balance
-        </p>
-
-        <h2 class="balance-amount">
-            UGX {{ customer.current_balance|floatformat:0 }}
-        </h2>
-
-    </div>
-
-    <!-- FORM CARD -->
-    <div class="custom-form-card">
-
-        <form method="POST">
-
-            {% csrf_token %}
-
-            <div class="row">
-
-                <!-- AMOUNT -->
-                <div class="col-md-6 mb-4">
-
-                    <label class="custom-label">
-                        Amount (UGX)
-                    </label>
-
-                    <input
-                        type="number"
-                        name="amount"
-                        class="custom-input"
-                        step="0.01"
-                        placeholder="Enter amount"
-                        required
-                    >
-
-                </div>
-
-                <!-- PAYMENT METHOD -->
-                <div class="col-md-6 mb-4">
-
-                    <label class="custom-label">
-                        Payment Method
-                    </label>
-
-                    <select name="payment_method" class="custom-input">
-
-                        <option value="cash">Cash</option>
-
-                        <option value="mobile_money">
-                            Mobile Money
-                        </option>
-
-                        <option value="bank">
-                            Bank Transfer
-                        </option>
-
-                    </select>
-
-                </div>
-
-            </div>
-
-            <!-- BUTTONS -->
-            <div class="d-flex justify-content-end gap-2 mt-4">
-
-                <a href="{% url 'customer_detail' customer.id %}" class="cancel-btn">
-                    Cancel
-                </a>
-
-                <button type="submit" class="save-btn">
-
-                    <i class="bi bi-wallet2 me-2"></i>
-
-                    Save Deposit
-
-                </button>
-
-            </div>
-
-        </form>
-
-    </div>
-
+          Save Deposit
+        </button>
+      </div>
+    </form>
+  </div>
 </div>
 
 {% endblock %}
