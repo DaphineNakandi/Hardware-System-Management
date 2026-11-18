@@ -18,29 +18,24 @@ from .models import (
 class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
-        fields = '__all__'
+        fields = [
+            'specification',
+            'category',
+            'unit',
+            'reorder_level',
+        ]
         widgets = {
-            'name': forms.TextInput(attrs={'class': 'form-control'}),
-            'specification': forms.TextInput(attrs={'class': 'form-control'}),
+            'specification': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'e.g. Hima 32.5N, 50kg',
+            }),
             'category': forms.Select(attrs={'class': 'form-select'}),
             'unit': forms.Select(attrs={'class': 'form-select'}),
             'reorder_level': forms.NumberInput(attrs={'class': 'form-control'}),
         }
 
-    def clean_name(self):
-        name = self.cleaned_data.get('name')
-
-        if name:
-            name = name.strip()
-
-            if len(name) < 2:
-                raise forms.ValidationError(
-                    "Product name must be at least 2 characters."
-                )
-
-            return name.title()
-
-        return name
+    def clean_specification(self):
+        return (self.cleaned_data.get('specification') or '').strip()
 
 
 # DEPOSIT CUSTOMER FORM
