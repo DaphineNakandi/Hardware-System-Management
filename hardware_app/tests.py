@@ -1,6 +1,7 @@
 from decimal import Decimal
 
 from django.test import TestCase
+from django.core.exceptions import ValidationError
 
 from .forms import (
     DepositCustomerForm,
@@ -208,7 +209,7 @@ class FormValidationTests(TestCase):
 
         self.product.category = "iron_bar"
         with self.assertRaisesMessage(
-            Exception,
+            ValidationError,
             "A product category cannot be changed after stock, sales, "
             "or customer withdrawals have been recorded.",
         ):
