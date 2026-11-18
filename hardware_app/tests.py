@@ -174,6 +174,68 @@ class FormValidationTests(TestCase):
                 self.assertFalse(form.is_valid())
                 self.assertIn("specification", form.errors)
 
+    def test_product_category_can_change_before_transaction_history(self):
+        self.product.category = "iron_bar"
+        self.product.save()
+
+        self.assertEqual(self.product.name, "Iron Bar")
+
+    def test_product_category_cannot_change_after_transaction_history(self):
+        StockEntry.objects.create(
+            product=self.product,
+            quantity=20,
+            cost_price=Decimal("28000.00"),
+            selling_price=Decimal("32000.00"),
+            payment_method="cash",
+        )
+        customer = DepositCustomer.objects.create(
+            full_name="History Customer",
+            nin="HISTORY-NIN-001",
+            phone="0700000000",
+        )
+        Sale.objects.create(
+            product=self.product,
+            quantity_sold=2,
+            selling_price=Decimal("32000.00"),
+            payment_method="cash",
+        )
+        DepositWithdrawal.objects.create(
+            customer=customer,
+            product=self.product,
+            quantity=1,
+            value_deducted=Decimal("32000.00"),
+        )
+
+        self.product.category = "iron_bar"
+        with self.assertRaisesMessage(
+            Exception,
+            "A product category cannot be changed after stock, sales, "
+            "or customer withdrawals have been recorded.",
+        ):
+            self.product.save()
+
+    def test_product_form_rejects_category_change_after_history(self):
+        StockEntry.objects.create(
+            product=self.product,
+            quantity=20,
+            cost_price=Decimal("28000.00"),
+            selling_price=Decimal("32000.00"),
+            payment_method="cash",
+        )
+
+        form = ProductForm(
+            data={
+                "specification": "Hima 32.5N, 50kg",
+                "category": "iron_bar",
+                "unit": "bag",
+                "reorder_level": 10,
+            },
+            instance=self.product,
+        )
+
+        self.assertFalse(form.is_valid())
+        self.assertIn("category", form.errors)
+
     def test_direct_product_save_cannot_store_arbitrary_name(self):
         product = Product.objects.create(
             name="Sugar",
