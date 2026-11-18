@@ -35,7 +35,10 @@ class ProductForm(forms.ModelForm):
         }
 
     def clean_specification(self):
-        return (self.cleaned_data.get('specification') or '').strip()
+        specification = (self.cleaned_data.get('specification') or '').strip()
+        if not specification:
+            raise forms.ValidationError("Product specification is required.")
+        return specification
 
 
 # DEPOSIT CUSTOMER FORM
