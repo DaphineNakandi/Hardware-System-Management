@@ -34,6 +34,26 @@ class ProductForm(forms.ModelForm):
             'reorder_level': forms.NumberInput(attrs={'class': 'form-control'}),
         }
 
+    def clean_category(self):
+        category = self.cleaned_data.get('category')
+        product = self.instance
+
+        if (
+            product.pk
+            and category != product.category
+            and (
+                product.stock_entries.exists()
+                or product.sale_set.exists()
+                or product.depositwithdrawal_set.exists()
+            )
+        ):
+            raise forms.ValidationError(
+                "A product category cannot be changed after stock, sales, "
+                "or customer withdrawals have been recorded."
+            )
+
+        return category
+
     def clean_specification(self):
         specification = (self.cleaned_data.get('specification') or '').strip()
         if not specification:
