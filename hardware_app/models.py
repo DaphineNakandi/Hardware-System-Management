@@ -47,6 +47,28 @@ class Product(models.Model):
         if self.category not in category_names:
             raise ValidationError({"category": "Select an approved hardware category."})
 
+        # Preserve the meaning of historical transactions: once a product has
+        # stock, sales, or withdrawals, its category cannot be changed.
+        if self.pk:
+            original_category = (
+                Product.objects.filter(pk=self.pk)
+                .values_list('category', flat=True)
+                .first()
+            )
+            if original_category and original_category != self.category:
+                has_history = (
+                    self.stock_entries.exists()
+                    or self.sale_set.exists()
+                    or self.depositwithdrawal_set.exists()
+                )
+                if has_history:
+                    raise ValidationError({
+                        "category": (
+                            "A product category cannot be changed after "
+                            "stock, sales, or customer withdrawals have been recorded."
+                        )
+                    })
+
         # Product names come from the approved category list, never free text.
         self.name = category_names[self.category]
         self.specification = self.specification.strip()
