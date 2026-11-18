@@ -176,14 +176,14 @@ class FormValidationTests(TestCase):
                 self.assertIn("specification", form.errors)
 
     def test_product_category_can_change_before_transaction_history(self):
-        self.product.category = "iron_bar"
-        self.product.save()
+        self.eligible_product.category = "iron_bar"
+        self.eligible_product.save()
 
-        self.assertEqual(self.product.name, "Iron Bar")
+        self.assertEqual(self.eligible_product.name, "Iron Bar")
 
     def test_product_category_cannot_change_after_transaction_history(self):
         StockEntry.objects.create(
-            product=self.product,
+            product=self.eligible_product,
             quantity=20,
             cost_price=Decimal("28000.00"),
             selling_price=Decimal("32000.00"),
@@ -195,29 +195,29 @@ class FormValidationTests(TestCase):
             phone="0700000000",
         )
         Sale.objects.create(
-            product=self.product,
+            product=self.eligible_product,
             quantity_sold=2,
             selling_price=Decimal("32000.00"),
             payment_method="cash",
         )
         DepositWithdrawal.objects.create(
             customer=customer,
-            product=self.product,
+            product=self.eligible_product,
             quantity=1,
             value_deducted=Decimal("32000.00"),
         )
 
-        self.product.category = "iron_bar"
+        self.eligible_product.category = "iron_bar"
         with self.assertRaisesMessage(
             ValidationError,
             "A product category cannot be changed after stock, sales, "
             "or customer withdrawals have been recorded.",
         ):
-            self.product.save()
+            self.eligible_product.save()
 
     def test_product_form_rejects_category_change_after_history(self):
         StockEntry.objects.create(
-            product=self.product,
+            product=self.eligible_product,
             quantity=20,
             cost_price=Decimal("28000.00"),
             selling_price=Decimal("32000.00"),
@@ -231,7 +231,7 @@ class FormValidationTests(TestCase):
                 "unit": "bag",
                 "reorder_level": 10,
             },
-            instance=self.product,
+            instance=self.eligible_product,
         )
 
         self.assertFalse(form.is_valid())
