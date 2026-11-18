@@ -162,6 +162,18 @@ class FormValidationTests(TestCase):
         self.assertEqual(product.name, "Cement")
         self.assertEqual(product.specification, "Hima 32.5N, 50kg")
 
+    def test_product_form_rejects_blank_or_whitespace_specification(self):
+        for specification in ("", "   "):
+            with self.subTest(specification=specification):
+                form = ProductForm(data={
+                    "specification": specification,
+                    "category": "cement",
+                    "unit": "bag",
+                    "reorder_level": 10,
+                })
+                self.assertFalse(form.is_valid())
+                self.assertIn("specification", form.errors)
+
     def test_direct_product_save_cannot_store_arbitrary_name(self):
         product = Product.objects.create(
             name="Sugar",
