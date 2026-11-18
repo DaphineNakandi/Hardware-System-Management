@@ -1,13 +1,30 @@
 from django.db import models
 from django.db.models import Sum
 from django.core.validators import MinValueValidator
+from django.core.exceptions import ValidationError
 from datetime import datetime
 
 
 
 # PRODUCT MODEL
 
+
+# PRODUCT MODEL
+
+
+class ProductQuerySet(models.QuerySet):
+    def update(self, **kwargs):
+        if "category" in kwargs:
+            raise ValidationError(
+                "Product categories cannot be changed using bulk updates. "
+                "Use the product editing process instead."
+            )
+
+        return super().update(**kwargs)
+
+
 class Product(models.Model):
+    objects = ProductQuerySet.as_manager()
     name = models.CharField(max_length=100)
     specification = models.CharField(max_length=100, blank=True)
 
@@ -39,6 +56,49 @@ class Product(models.Model):
 
     class Meta:
         ordering = ['-date_created']
+
+    def save(self, *args, **kwargs):
+        category_names = dict(self.CATEGORY_CHOICES)
+
+        if self.category not in category_names:
+            raise ValidationError({"category": "Select an approved hardware category."})
+
+        # Preserve the meaning of historical transactions: once a product has
+        # stock, sales, or withdrawals, its category cannot be changed.
+        if self.pk:
+            original_category = (
+                Product.objects.filter(pk=self.pk)
+                .values_list('category', flat=True)
+                .first()
+            )
+            if original_category and original_category != self.category:
+                has_history = (
+                    self.stock_entries.exists()
+                    or self.sale_set.exists()
+                    or self.depositwithdrawal_set.exists()
+                )
+                if has_history:
+                    raise ValidationError({
+                        "category": (
+                            "A product category cannot be changed after "
+                            "stock, sales, or customer withdrawals have been recorded."
+                        )
+                    })
+
+        # Product names come from the approved category list, never free text.
+        self.name = category_names[self.category]
+        self.specification = (self.specification or "").strip()
+
+        if not self.specification:
+            raise ValidationError({
+                "specification": "Product specification is required."
+            })
+        update_fields = kwargs.get("update_fields")
+
+        if update_fields is not None and "category" in update_fields:
+            kwargs["update_fields"] = set(update_fields) | {"name"}
+
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.name} ({self.specification})" if self.specification else self.name

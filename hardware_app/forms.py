@@ -18,29 +18,47 @@ from .models import (
 class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
-        fields = '__all__'
+        fields = [
+            'specification',
+            'category',
+            'unit',
+            'reorder_level',
+        ]
         widgets = {
-            'name': forms.TextInput(attrs={'class': 'form-control'}),
-            'specification': forms.TextInput(attrs={'class': 'form-control'}),
+            'specification': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'e.g. Hima 32.5N, 50kg',
+            }),
             'category': forms.Select(attrs={'class': 'form-select'}),
             'unit': forms.Select(attrs={'class': 'form-select'}),
             'reorder_level': forms.NumberInput(attrs={'class': 'form-control'}),
         }
 
-    def clean_name(self):
-        name = self.cleaned_data.get('name')
+    def clean_category(self):
+        category = self.cleaned_data.get('category')
+        product = self.instance
 
-        if name:
-            name = name.strip()
+        if (
+            product.pk
+            and category != product.category
+            and (
+                product.stock_entries.exists()
+                or product.sale_set.exists()
+                or product.depositwithdrawal_set.exists()
+            )
+        ):
+            raise forms.ValidationError(
+                "A product category cannot be changed after stock, sales, "
+                "or customer withdrawals have been recorded."
+            )
 
-            if len(name) < 2:
-                raise forms.ValidationError(
-                    "Product name must be at least 2 characters."
-                )
+        return category
 
-            return name.title()
-
-        return name
+    def clean_specification(self):
+        specification = (self.cleaned_data.get('specification') or '').strip()
+        if not specification:
+            raise forms.ValidationError("Product specification is required.")
+        return specification
 
 
 # DEPOSIT CUSTOMER FORM
