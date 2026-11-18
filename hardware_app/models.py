@@ -1,6 +1,7 @@
 from django.db import models
 from django.db.models import Sum
 from django.core.validators import MinValueValidator
+from django.core.exceptions import ValidationError
 from datetime import datetime
 
 
@@ -39,6 +40,18 @@ class Product(models.Model):
 
     class Meta:
         ordering = ['-date_created']
+
+    def save(self, *args, **kwargs):
+        category_names = dict(self.CATEGORY_CHOICES)
+
+        if self.category not in category_names:
+            raise ValidationError({"category": "Select an approved hardware category."})
+
+        # Product names come from the approved category list, never free text.
+        self.name = category_names[self.category]
+        self.specification = self.specification.strip()
+
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.name} ({self.specification})" if self.specification else self.name
