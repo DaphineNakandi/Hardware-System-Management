@@ -8,7 +8,23 @@ from datetime import datetime
 
 # PRODUCT MODEL
 
+
+# PRODUCT MODEL
+
+
+class ProductQuerySet(models.QuerySet):
+    def update(self, **kwargs):
+        if "category" in kwargs:
+            raise ValidationError(
+                "Product categories cannot be changed using bulk updates. "
+                "Use the product editing process instead."
+            )
+
+        return super().update(**kwargs)
+
+
 class Product(models.Model):
+    objects = ProductQuerySet.as_manager()
     name = models.CharField(max_length=100)
     specification = models.CharField(max_length=100, blank=True)
 
@@ -71,8 +87,12 @@ class Product(models.Model):
 
         # Product names come from the approved category list, never free text.
         self.name = category_names[self.category]
-        self.specification = self.specification.strip()
+        self.specification = (self.specification or "").strip()
 
+        if not self.specification:
+            raise ValidationError({
+                "specification": "Product specification is required."
+            })
         super().save(*args, **kwargs)
 
     def __str__(self):

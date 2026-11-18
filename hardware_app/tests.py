@@ -1,5 +1,7 @@
+
 from decimal import Decimal
 
+from django.db import transaction
 from django.test import TestCase
 from django.core.exceptions import ValidationError
 
@@ -18,25 +20,33 @@ from .models import (
     StockEntry,
 )
 
+
 class ProductInventoryTests(TestCase):
     def setUp(self):
         self.product = Product.objects.create(
-            name="Cement", category="cement", unit="bag", reorder_level=5
+            name="Cement",
+            category="cement",
+            specification="Test 32.5N, 50kg",
+            unit="bag",
+            reorder_level=5,
         )
 
     def test_current_quantity_is_stock_received_minus_sales(self):
         StockEntry.objects.create(
-            product=self.product, quantity=20,
+            product=self.product,
+            quantity=20,
             cost_price=Decimal("28000.00"),
-            selling_price=Decimal("32000.00"), payment_method="cash",
+            selling_price=Decimal("32000.00"),
+            payment_method="cash",
         )
         Sale.objects.create(
-            product=self.product, quantity_sold=3,
-            selling_price=Decimal("32000.00"), payment_method="cash",
+            product=self.product,
+            quantity_sold=3,
+            selling_price=Decimal("32000.00"),
+            payment_method="cash",
         )
         self.assertEqual(self.product.current_quantity, 17)
 
-    
     def test_current_quantity_also_subtracts_customer_withdrawals(self):
         StockEntry.objects.create(
             product=self.product,
@@ -68,33 +78,83 @@ class ProductInventoryTests(TestCase):
 
         self.assertEqual(self.product.current_quantity, 75)
 
-
     def test_product_without_stock_has_zero_quantity(self):
         self.assertEqual(self.product.current_quantity, 0)
+
+    def test_queryset_update_cannot_change_product_category(self):
+        with self.assertRaisesMessage(
+            ValidationError,
+            "Product categories cannot be changed using bulk updates.",
+        ):
+            Product.objects.filter(pk=self.product.pk).update(
+                category="iron_bar"
+            )
+
+        self.product.refresh_from_db()
+
+        self.assertEqual(self.product.category, "cement")
+
+    def test_bulk_update_cannot_change_product_category(self):
+        self.product.category = "iron_bar"
+
+        with self.assertRaisesMessage(
+            ValidationError,
+            "Product categories cannot be changed using bulk updates.",
+        ):
+            with transaction.atomic():
+                Product.objects.bulk_update(
+                    [self.product],
+                    ["category"],
+                )
+
+        self.product.refresh_from_db()
+
+        self.assertEqual(self.product.category, "cement")
+
+    def test_product_cannot_be_created_without_specification(self):
+        with self.assertRaisesMessage(
+            ValidationError,
+            "Product specification is required.",
+        ):
+            Product.objects.create(
+                name="Cement",
+                category="cement",
+                specification="   ",
+            )
 
 
 class SaleCalculationTests(TestCase):
     def setUp(self):
-        self.product = Product.objects.create(name="Iron bar", category="iron_bar")
+        self.product = Product.objects.create(
+            name="Iron bar",
+            category="iron_bar",
+            specification="Test 12mm",
+        )
 
     def test_total_amount_includes_transport(self):
         sale = Sale.objects.create(
-            product=self.product, quantity_sold=2,
+            product=self.product,
+            quantity_sold=2,
             selling_price=Decimal("250000.00"),
-            transport=Decimal("30000.00"), payment_method="cash",
+            transport=Decimal("30000.00"),
+            payment_method="cash",
         )
         self.assertEqual(sale.total_amount, Decimal("530000.00"))
 
     def test_free_transport_requires_distance_and_minimum_purchase(self):
         eligible = Sale.objects.create(
-            product=self.product, quantity_sold=2,
+            product=self.product,
+            quantity_sold=2,
             selling_price=Decimal("250000.00"),
-            customer_distance_km=Decimal("10.00"), payment_method="cash",
+            customer_distance_km=Decimal("10.00"),
+            payment_method="cash",
         )
         distant = Sale.objects.create(
-            product=self.product, quantity_sold=2,
+            product=self.product,
+            quantity_sold=2,
             selling_price=Decimal("250000.00"),
-            customer_distance_km=Decimal("10.01"), payment_method="cash",
+            customer_distance_km=Decimal("10.01"),
+            payment_method="cash",
         )
         self.assertTrue(eligible.qualifies_for_free_transport)
         self.assertFalse(distant.qualifies_for_free_transport)
@@ -103,40 +163,60 @@ class SaleCalculationTests(TestCase):
 class DepositBalanceTests(TestCase):
     def setUp(self):
         self.customer = DepositCustomer.objects.create(
-            full_name="Test Customer", nin="TEST-NIN-001", phone="0700000000"
+            full_name="Test Customer",
+            nin="TEST-NIN-001",
+            phone="0700000000",
         )
-        self.product = Product.objects.create(name="Cement", category="cement")
+        self.product = Product.objects.create(
+            name="Cement",
+            category="cement",
+            specification="Test 32.5N, 50kg",
+        )
 
     def test_current_balance_is_deposits_minus_withdrawals(self):
         DepositPayment.objects.create(
-            customer=self.customer, amount=Decimal("200000.00"), payment_method="cash"
+            customer=self.customer,
+            amount=Decimal("200000.00"),
+            payment_method="cash",
         )
         DepositWithdrawal.objects.create(
-            customer=self.customer, product=self.product, quantity=2,
+            customer=self.customer,
+            product=self.product,
+            quantity=2,
             value_deducted=Decimal("65000.00"),
         )
-        self.assertEqual(self.customer.current_balance, Decimal("135000.00"))
+        self.assertEqual(
+            self.customer.current_balance,
+            Decimal("135000.00"),
+        )
 
     def test_customer_cannot_pick_goods_beyond_balance(self):
         DepositPayment.objects.create(
-            customer=self.customer, amount=Decimal("50000.00"), payment_method="cash"
+            customer=self.customer,
+            amount=Decimal("50000.00"),
+            payment_method="cash",
         )
-        self.assertTrue(self.customer.can_pick_goods(Decimal("50000.00")))
-        self.assertFalse(self.customer.can_pick_goods(Decimal("50000.01")))
+        self.assertTrue(
+            self.customer.can_pick_goods(Decimal("50000.00"))
+        )
+        self.assertFalse(
+            self.customer.can_pick_goods(Decimal("50000.01"))
+        )
 
 
 class FormValidationTests(TestCase):
-
     def setUp(self):
         self.eligible_product = Product.objects.create(
             name="Cement",
             category="cement",
+            specification="Test 32.5N, 50kg",
             unit="bag",
         )
 
         self.ineligible_product = Product.objects.create(
             name="Nail",
             category="nail",
+            specification="Test 3-inch",
             unit="kg",
         )
 
@@ -189,17 +269,20 @@ class FormValidationTests(TestCase):
             selling_price=Decimal("32000.00"),
             payment_method="cash",
         )
+
         customer = DepositCustomer.objects.create(
             full_name="History Customer",
             nin="HISTORY-NIN-001",
             phone="0700000000",
         )
+
         Sale.objects.create(
             product=self.eligible_product,
             quantity_sold=2,
             selling_price=Decimal("32000.00"),
             payment_method="cash",
         )
+
         DepositWithdrawal.objects.create(
             customer=customer,
             product=self.eligible_product,
@@ -208,6 +291,7 @@ class FormValidationTests(TestCase):
         )
 
         self.eligible_product.category = "iron_bar"
+
         with self.assertRaisesMessage(
             ValidationError,
             "A product category cannot be changed after stock, sales, "
