@@ -30,6 +30,39 @@ class ProductInventoryTests(TestCase):
         )
         self.assertEqual(self.product.current_quantity, 17)
 
+    
+    def test_current_quantity_also_subtracts_customer_withdrawals(self):
+        StockEntry.objects.create(
+            product=self.product,
+            quantity=100,
+            cost_price=Decimal("28000.00"),
+            selling_price=Decimal("32000.00"),
+            payment_method="cash",
+        )
+
+        Sale.objects.create(
+            product=self.product,
+            quantity_sold=20,
+            selling_price=Decimal("32000.00"),
+            payment_method="cash",
+        )
+
+        customer = DepositCustomer.objects.create(
+            full_name="Test Customer",
+            nin="TEST-NIN-003",
+            phone="0700000000",
+        )
+
+        DepositWithdrawal.objects.create(
+            customer=customer,
+            product=self.product,
+            quantity=5,
+            value_deducted=Decimal("160000.00"),
+        )
+
+        self.assertEqual(self.product.current_quantity, 75)
+
+
     def test_product_without_stock_has_zero_quantity(self):
         self.assertEqual(self.product.current_quantity, 0)
 

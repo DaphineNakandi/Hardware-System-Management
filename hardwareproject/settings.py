@@ -28,6 +28,11 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+
+    # Django REST Framework
+    "rest_framework",
+
+    # Project applications
     "hardware_app",
     "django.contrib.humanize",
     "crispy_forms",

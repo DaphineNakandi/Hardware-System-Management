@@ -43,11 +43,23 @@ class Product(models.Model):
     def __str__(self):
         return f"{self.name} ({self.specification})" if self.specification else self.name
 
+    
     @property
     def current_quantity(self):
-        total_in = self.stock_entries.aggregate(total=Sum('quantity'))['total'] or 0
-        total_out = self.sale_set.aggregate(total=Sum('quantity_sold'))['total'] or 0
-        return total_in - total_out
+        total_in = self.stock_entries.aggregate(
+            total=Sum('quantity')
+        )['total'] or 0
+
+        total_sold = self.sale_set.aggregate(
+            total=Sum('quantity_sold')
+        )['total'] or 0
+
+        total_withdrawn = self.depositwithdrawal_set.aggregate(
+            total=Sum('quantity')
+        )['total'] or 0
+
+        return total_in - total_sold - total_withdrawn
+
 
 
 # DEPOSIT CUSTOMER
