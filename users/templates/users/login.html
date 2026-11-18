@@ -18,7 +18,11 @@
         <form method="POST" novalidate>
           {% csrf_token %}
 
-          {{ form.non_field_errors }}
+          {% if form.non_field_errors %}
+          <div class="alert alert-danger" role="alert">
+            {{ form.non_field_errors }}
+          </div>
+          {% endif %}
 
           <div class="mb-3" style="color:#fff;">
             {{ form.username.label_tag }}

@@ -2,6 +2,7 @@ from decimal import Decimal
 
 from django.test import TestCase
 
+from .forms import DepositCustomerForm, DepositWithdrawalForm, SupplierForm
 from .models import (
     DepositCustomer,
     DepositPayment,
@@ -10,7 +11,6 @@ from .models import (
     Sale,
     StockEntry,
 )
-
 
 class ProductInventoryTests(TestCase):
     def setUp(self):
@@ -84,3 +84,51 @@ class DepositBalanceTests(TestCase):
         )
         self.assertTrue(self.customer.can_pick_goods(Decimal("50000.00")))
         self.assertFalse(self.customer.can_pick_goods(Decimal("50000.01")))
+
+
+class FormValidationTests(TestCase):
+
+    def setUp(self):
+        self.eligible_product = Product.objects.create(
+            name="Cement",
+            category="cement",
+            unit="bag",
+        )
+
+        self.ineligible_product = Product.objects.create(
+            name="Nail",
+            category="nail",
+            unit="kg",
+        )
+
+    def test_withdrawal_form_only_shows_eligible_products(self):
+        form = DepositWithdrawalForm()
+
+        product_ids = list(
+            form.fields["product"].queryset.values_list("id", flat=True)
+        )
+
+        self.assertIn(self.eligible_product.id, product_ids)
+        self.assertNotIn(self.ineligible_product.id, product_ids)
+
+    def test_supplier_form_does_not_expose_credit_balance(self):
+        form = SupplierForm()
+
+        self.assertNotIn("credit_balance", form.fields)
+
+    def test_customer_form_strips_whitespace_from_full_name(self):
+        form = DepositCustomerForm(data={
+            "full_name": "  Test Customer  ",
+            "nin": "TEST-NIN-002",
+            "phone": "0700000000",
+            "employer": "",
+            "monthly_salary": "500000",
+            "is_active": "on",
+            "notes": "",
+        })
+
+        self.assertTrue(form.is_valid(), form.errors)
+        self.assertEqual(
+            form.cleaned_data["full_name"],
+            "Test Customer",
+        )
