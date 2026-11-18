@@ -66,14 +66,21 @@ pip install -r requirements.txt
 
 ### 4. Configure environment variables
 
-Create a `.env` file in the project root:
+Copy `.env.example` to a new file named `.env` in the project root, then replace the placeholder secret key with a long random value. Keep `DEBUG=True` only for local development.
 
-```env
-SECRET_KEY=replace-with-a-long-random-secret
-DEBUG=True
+**Windows (PowerShell):**
+
+```powershell
+Copy-Item .env.example .env
 ```
 
-Keep `.env` private. Do not commit real secret keys or production credentials.
+**macOS / Linux:**
+
+```bash
+cp .env.example .env
+```
+
+The example also sets `ALLOWED_HOSTS` for local development. Keep `.env` private. Do not commit real secret keys or production credentials.
 
 ### 5. Set up the database and start the server
 
