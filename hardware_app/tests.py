@@ -94,6 +94,15 @@ class ProductInventoryTests(TestCase):
 
         self.assertEqual(self.product.category, "cement")
 
+    def test_category_update_also_updates_derived_product_name(self):
+        self.product.category = "iron_bar"
+        self.product.save(update_fields=["category"])
+
+        self.product.refresh_from_db()
+
+        self.assertEqual(self.product.category, "iron_bar")
+        self.assertEqual(self.product.name, "Iron Bar")
+
     def test_bulk_update_cannot_change_product_category(self):
         self.product.category = "iron_bar"
 
