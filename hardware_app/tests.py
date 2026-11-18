@@ -2,7 +2,12 @@ from decimal import Decimal
 
 from django.test import TestCase
 
-from .forms import DepositCustomerForm, DepositWithdrawalForm, SupplierForm
+from .forms import (
+    DepositCustomerForm,
+    DepositWithdrawalForm,
+    ProductForm,
+    SupplierForm,
+)
 from .models import (
     DepositCustomer,
     DepositPayment,
@@ -133,6 +138,39 @@ class FormValidationTests(TestCase):
             category="nail",
             unit="kg",
         )
+
+    def test_product_form_does_not_allow_manual_product_names(self):
+        form = ProductForm()
+
+        self.assertNotIn("name", form.fields)
+        self.assertEqual(
+            list(form.fields),
+            ["specification", "category", "unit", "reorder_level"],
+        )
+
+    def test_product_form_saves_name_from_approved_category(self):
+        form = ProductForm(data={
+            "specification": "  Hima 32.5N, 50kg  ",
+            "category": "cement",
+            "unit": "bag",
+            "reorder_level": 10,
+        })
+
+        self.assertTrue(form.is_valid(), form.errors)
+        product = form.save()
+
+        self.assertEqual(product.name, "Cement")
+        self.assertEqual(product.specification, "Hima 32.5N, 50kg")
+
+    def test_direct_product_save_cannot_store_arbitrary_name(self):
+        product = Product.objects.create(
+            name="Sugar",
+            category="cement",
+            specification="Hima 32.5N, 50kg",
+            unit="bag",
+        )
+
+        self.assertEqual(product.name, "Cement")
 
     def test_withdrawal_form_only_shows_eligible_products(self):
         form = DepositWithdrawalForm()
