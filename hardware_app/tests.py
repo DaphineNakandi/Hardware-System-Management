@@ -23,8 +23,8 @@ from .models import (
     Product,
     Sale,
     StockEntry,
+    Supplier,
 )
-
 
 
 class ProductInventoryTests(TestCase):
@@ -533,3 +533,279 @@ class ProductAPITests(APITestCase):
             status.HTTP_201_CREATED,
         )
         self.assertEqual(response.data["name"], "Iron Bar")
+
+
+class StockEntryAPITests(APITestCase):
+    def setUp(self):
+        self.product = Product.objects.create(
+            name="Cement",
+            category="cement",
+            specification="Test 32.5N, 50kg",
+            unit="bag",
+            reorder_level=5,
+        )
+
+        self.supplier = Supplier.objects.create(
+            name="Test Supplier",
+            credit_balance=Decimal("0.00"),
+        )
+
+        self.list_url = "/api/stock-entries/"
+
+        manager_group, _ = Group.objects.get_or_create(
+            name="Store Manager"
+        )
+
+        self.manager = User.objects.create_user(
+            username="stock_api_manager",
+            password="test_password123",
+        )
+        self.manager.groups.add(manager_group)
+
+        self.client.force_authenticate(user=self.manager)
+
+    def stock_data(self, **overrides):
+        data = {
+            "product": self.product.id,
+            "quantity": 20,
+            "cost_price": "28000.00",
+            "selling_price": "32000.00",
+            "supplier": self.supplier.id,
+            "payment_method": "cash",
+        }
+        data.update(overrides)
+        return data
+
+    def test_list_stock_entries(self):
+        StockEntry.objects.create(
+            product=self.product,
+            quantity=10,
+            cost_price=Decimal("28000.00"),
+            selling_price=Decimal("32000.00"),
+        )
+
+        response = self.client.get(self.list_url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+
+    def test_create_stock_entry(self):
+        response = self.client.post(
+            self.list_url,
+            self.stock_data(),
+            format="json",
+        )
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_201_CREATED,
+        )
+        self.assertEqual(response.data["quantity"], 20)
+        self.assertEqual(StockEntry.objects.count(), 1)
+
+    def test_create_credit_stock_entry_updates_supplier_balance(self):
+        response = self.client.post(
+            self.list_url,
+            self.stock_data(payment_method="credit"),
+            format="json",
+        )
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_201_CREATED,
+        )
+
+        self.supplier.refresh_from_db()
+
+        self.assertEqual(
+            self.supplier.credit_balance,
+            Decimal("560000.00"),
+        )
+
+    def test_create_stock_entry_rejects_selling_price_below_cost(self):
+        response = self.client.post(
+            self.list_url,
+            self.stock_data(selling_price="25000.00"),
+            format="json",
+        )
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_400_BAD_REQUEST,
+        )
+        self.assertIn("selling_price", response.data)
+        self.assertEqual(StockEntry.objects.count(), 0)
+
+    def test_retrieve_stock_entry(self):
+        entry = StockEntry.objects.create(
+            product=self.product,
+            quantity=10,
+            cost_price=Decimal("28000.00"),
+            selling_price=Decimal("32000.00"),
+        )
+
+        response = self.client.get(
+            f"{self.list_url}{entry.id}/"
+        )
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_200_OK,
+        )
+        self.assertEqual(response.data["id"], entry.id)
+
+    def test_update_credit_stock_entry_adjusts_supplier_balance(self):
+        entry = StockEntry.objects.create(
+            product=self.product,
+            quantity=10,
+            cost_price=Decimal("28000.00"),
+            selling_price=Decimal("32000.00"),
+            supplier=self.supplier,
+            payment_method="credit",
+        )
+
+        self.supplier.credit_balance = Decimal("280000.00")
+        self.supplier.save()
+
+        response = self.client.patch(
+            f"{self.list_url}{entry.id}/",
+            {"quantity": 20},
+            format="json",
+        )
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_200_OK,
+        )
+
+        self.supplier.refresh_from_db()
+
+        self.assertEqual(
+            self.supplier.credit_balance,
+            Decimal("560000.00"),
+        )
+
+    def test_cashier_cannot_create_stock_entries(self):
+        cashier_group, _ = Group.objects.get_or_create(
+            name="Cashier"
+        )
+
+        cashier = User.objects.create_user(
+            username="stock_api_cashier",
+            password="test_password123",
+        )
+        cashier.groups.add(cashier_group)
+
+        self.client.force_authenticate(user=cashier)
+
+        response = self.client.post(
+            self.list_url,
+            self.stock_data(),
+            format="json",
+        )
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_403_FORBIDDEN,
+        )
+
+    def test_changing_credit_entry_to_cash_reverses_supplier_balance(self):
+        entry = StockEntry.objects.create(
+            product=self.product,
+            quantity=10,
+            cost_price=Decimal("28000.00"),
+            selling_price=Decimal("32000.00"),
+            supplier=self.supplier,
+            payment_method="credit",
+        )
+
+        self.supplier.credit_balance = Decimal("280000.00")
+        self.supplier.save()
+
+        response = self.client.patch(
+            f"{self.list_url}{entry.id}/",
+            {"payment_method": "cash"},
+            format="json",
+       )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.supplier.refresh_from_db()
+
+        self.assertEqual(
+            self.supplier.credit_balance,
+            Decimal("0.00"),
+        )
+
+    def test_changing_supplier_on_credit_entry_adjusts_both_balances(self):
+        second_supplier = Supplier.objects.create(
+            name="Second Supplier",
+            credit_balance=Decimal("0.00"),
+       )
+
+        entry = StockEntry.objects.create(
+            product=self.product,
+            quantity=10,
+            cost_price=Decimal("28000.00"),
+            selling_price=Decimal("32000.00"),
+            supplier=self.supplier,
+            payment_method="credit",
+       )
+
+        self.supplier.credit_balance = Decimal("280000.00")
+        self.supplier.save()
+
+        response = self.client.patch(
+            f"{self.list_url}{entry.id}/",
+            {"supplier": second_supplier.id},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.supplier.refresh_from_db()
+        second_supplier.refresh_from_db()
+
+        self.assertEqual(
+            self.supplier.credit_balance,
+            Decimal("0.00"),
+        )
+
+        self.assertEqual(
+            second_supplier.credit_balance,
+            Decimal("280000.00"),
+        )
+
+    def test_credit_entry_update_is_rejected_if_supplier_balance_would_be_negative(self):
+        entry = StockEntry.objects.create(
+            product=self.product,
+            quantity=10,
+            cost_price=Decimal("28000.00"),
+            selling_price=Decimal("32000.00"),
+            supplier=self.supplier,
+            payment_method="credit",
+        )
+
+        # The supplier has only partially paid the original debt.
+        self.supplier.credit_balance = Decimal("100000.00")
+        self.supplier.save()
+
+        response = self.client.patch(
+            f"{self.list_url}{entry.id}/",
+            {"payment_method": "cash"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("supplier", response.data)
+
+        # Confirm the stock entry was not changed.
+        entry.refresh_from_db()
+        self.assertEqual(entry.payment_method, "credit")
+
+        # Confirm the supplier's balance was not changed.
+        self.supplier.refresh_from_db()
+        self.assertEqual(
+            self.supplier.credit_balance,
+            Decimal("100000.00"),
+       )
