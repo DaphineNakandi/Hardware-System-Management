@@ -1,6 +1,8 @@
 
 from decimal import Decimal
 
+from django.contrib.auth.models import Group, User
+
 from django.db import transaction
 from django.test import TestCase
 from django.core.exceptions import ValidationError
@@ -389,6 +391,20 @@ class ProductAPITests(APITestCase):
         self.list_url = "/api/products/"
         self.detail_url = f"/api/products/{self.product.id}/"
 
+        # Create an authenticated Store Manager for normal API tests.
+        manager_group, _ = Group.objects.get_or_create(
+            name="Store Manager"
+        )
+
+        self.manager = User.objects.create_user(
+            username="api_test_manager",
+            password="test_password123",
+        )
+        self.manager.groups.add(manager_group)
+
+        self.client.force_authenticate(user=self.manager)
+
+        
     def test_list_products(self):
         response = self.client.get(self.list_url)
 
@@ -447,3 +463,73 @@ class ProductAPITests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("specification", response.data)
+
+    def test_unauthenticated_user_cannot_view_products(self):
+        self.client.force_authenticate(user=None)
+
+        response = self.client.get(self.list_url)
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_403_FORBIDDEN,
+        )
+
+    def test_authenticated_staff_can_view_products(self):
+        cashier_group = Group.objects.create(name="Cashier")
+        cashier = User.objects.create_user(
+            username="test_cashier",
+            password="test_password123",
+        )
+        cashier.groups.add(cashier_group)
+
+        self.client.force_authenticate(user=cashier)
+
+        response = self.client.get(self.list_url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_cashier_cannot_create_products(self):
+        cashier_group = Group.objects.create(name="Cashier")
+        cashier = User.objects.create_user(
+            username="test_cashier",
+            password="test_password123",
+        )
+        cashier.groups.add(cashier_group)
+
+        self.client.force_authenticate(user=cashier)
+
+        response = self.client.post(
+            self.list_url,
+            {
+                "category": "cement",
+                "specification": "50kg",
+                "unit": "bag",
+                "reorder_level": 10,
+            },
+            format="json",
+        )
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_403_FORBIDDEN,
+        )
+
+    def test_store_manager_can_create_products(self):
+        self.client.force_authenticate(user=self.manager)
+
+        response = self.client.post(
+            self.list_url,
+            {
+                "category": "iron_bar",
+                "specification": "12mm",
+                "unit": "piece",
+                "reorder_level": 10,
+            },
+            format="json",
+        )
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_201_CREATED,
+        )
+        self.assertEqual(response.data["name"], "Iron Bar")

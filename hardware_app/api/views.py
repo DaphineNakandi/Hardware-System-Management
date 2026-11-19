@@ -1,8 +1,8 @@
-
 from rest_framework import generics
 
 from hardware_app.models import Product
 from .serializers import ProductSerializer
+from .permissions import IsStoreManagerOrReadOnly
 
 
 class ProductListCreateAPIView(generics.ListCreateAPIView):
@@ -12,6 +12,7 @@ class ProductListCreateAPIView(generics.ListCreateAPIView):
 
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+    permission_classes = [IsStoreManagerOrReadOnly]
 
 
 class ProductDetailAPIView(generics.RetrieveUpdateAPIView):
@@ -21,3 +22,4 @@ class ProductDetailAPIView(generics.RetrieveUpdateAPIView):
 
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+    permission_classes = [IsStoreManagerOrReadOnly]
