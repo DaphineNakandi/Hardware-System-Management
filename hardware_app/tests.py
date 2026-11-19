@@ -5,6 +5,9 @@ from django.db import transaction
 from django.test import TestCase
 from django.core.exceptions import ValidationError
 
+from rest_framework import status
+from rest_framework.test import APITestCase
+
 from .forms import (
     DepositCustomerForm,
     DepositWithdrawalForm,
@@ -19,6 +22,7 @@ from .models import (
     Sale,
     StockEntry,
 )
+
 
 
 class ProductInventoryTests(TestCase):
@@ -371,3 +375,75 @@ class FormValidationTests(TestCase):
             form.cleaned_data["full_name"],
             "Test Customer",
         )
+
+class ProductAPITests(APITestCase):
+    def setUp(self):
+        self.product = Product.objects.create(
+            name="Cement",
+            category="cement",
+            specification="Test 32.5N, 50kg",
+            unit="bag",
+            reorder_level=5,
+        )
+
+        self.list_url = "/api/products/"
+        self.detail_url = f"/api/products/{self.product.id}/"
+
+    def test_list_products(self):
+        response = self.client.get(self.list_url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+
+    def test_retrieve_product(self):
+        response = self.client.get(self.detail_url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["id"], self.product.id)
+        self.assertEqual(response.data["category"], "cement")
+
+    def test_create_product(self):
+        data = {
+            "category": "iron_bar",
+            "specification": "12mm",
+            "unit": "piece",
+            "reorder_level": 10,
+        }
+
+        response = self.client.post(
+            self.list_url,
+            data,
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data["name"], "Iron Bar")
+        self.assertEqual(response.data["specification"], "12mm")
+
+    def test_update_product_specification(self):
+        response = self.client.patch(
+            self.detail_url,
+            {"specification": "50kg"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.product.refresh_from_db()
+        self.assertEqual(self.product.specification, "50kg")
+
+    def test_create_product_requires_specification(self):
+        data = {
+            "category": "cement",
+            "unit": "bag",
+            "reorder_level": 10,
+        }
+
+        response = self.client.post(
+            self.list_url,
+            data,
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("specification", response.data)
